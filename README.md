@@ -129,6 +129,6 @@ Contains the Node.js / Express backend application.
 
 ## Support
 
-For any issues please contact us via [mail](queenb.community@gmail.com) or open an issue.
+For any issues please contact us via [mail](mailto:queenb.community@gmail.com) or open an issue.
 
 **Happy Coding! :)**
