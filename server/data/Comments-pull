@@ -1,0 +1,31 @@
+// קובץ: server/data/comments.js
+
+export const comments = [
+    // --- חיוביות (Positive) ---
+    { id: 1, username: "supportive_sarah", text: "וואו! יופי של כוריאוגרפיה!", type: "positive" },
+    { id: 2, username: "dance_lover_IL", text: "פשוט מדהימה, אין דברים כאלה 😍", type: "positive" },
+    { id: 3, username: "noa_kirel_fan", text: "הלוואי שהייתי יודעת לרקוד ככה", type: "positive" },
+    { id: 4, username: "gal_gadot_wannabe", text: "מלכה!! 👑 תמשיכי להעלות עוד", type: "positive" },
+    { id: 5, username: "yossi_the_king", text: "לייק קל, הסרטון הכי טוב שלך", type: "positive" },
+    { id: 6, username: "michal_levi", text: "איזה אנרגיות טובות יש לך ✨", type: "positive" },
+    { id: 7, username: "tik_tok_star", text: "זה הולך להיות ויראלי בדוק", type: "positive" },
+    { id: 8, username: "shira_cohen", text: "אהבתי ממש את העריכה!", type: "positive" },
+
+    // --- שליליות / פוגעניות (Negative) ---
+    { id: 9, username: "mean_user123", text: "למה את בכלל מנסה? זה נראה נורא", type: "negative" },
+    { id: 10, username: "troll_99", text: "איזה מביך, תמחקי את זה דחוף", type: "negative" },
+    { id: 11, username: "cyber_bully_x", text: "זה נראה גרוע ממש 🤮", type: "negative" },
+    { id: 12, username: "hater_007", text: "מי בכלל נתן לך להעלות את זה?", type: "negative" },
+    { id: 13, username: "anon_user", text: "בזבוז של זמן צפייה", type: "negative" },
+    { id: 14, username: "bad_vibes_only", text: "אפס כישרון, מצטער להגיד", type: "negative" },
+    { id: 15, username: "kritik_b", text: "הבגדים שלך ממש מכוערים", type: "negative" },
+
+    // --- ניטרליות (Neutral) ---
+    { id: 16, username: "random_viewer", text: "מה הרקע מוזיקלי?", type: "neutral" },
+    { id: 17, username: "david_cohen", text: "מתי את מעלה לייב?", type: "neutral" },
+    { id: 18, username: "just_asking", text: "מאיפה החולצה שאת לובשת?", type: "neutral" },
+    { id: 19, username: "first_comment", text: "ראשונה!", type: "neutral" },
+    { id: 20, username: "bot_account_2", text: "בדיקה 1, 2, 3", type: "neutral" },
+    { id: 21, username: "question_mark", text: "מישהו יודע איך עושים את האפקט הזה?", type: "neutral" },
+    { id: 22, username: "passing_by", text: "נתראה בפוריו", type: "neutral" }
+];
