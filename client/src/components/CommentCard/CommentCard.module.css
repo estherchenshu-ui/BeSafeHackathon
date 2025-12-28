@@ -1,0 +1,90 @@
+/* CommentCard.module.css */
+
+.comment-card {
+    background-color: #161622;
+    color: white;
+    padding: 16px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    border-right: 4px solid transparent;
+    font-family: sans-serif;
+    margin-bottom: 15px;
+    direction: rtl; /* חשוב לעברית */
+}
+
+.comment-card.negative {
+    border-right-color: #ef4444;
+    background: linear-gradient(to left, rgba(239, 68, 68, 0.1), #161622);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.user-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    background-color: #555;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.user-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.username { font-weight: bold; font-size: 14px; }
+.time { font-size: 12px; color: #888; }
+.impact { font-weight: bold; color: #ef4444; }
+
+.comment-text {
+    margin-bottom: 15px;
+    line-height: 1.5;
+    font-size: 15px;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #333;
+    padding-top: 10px;
+}
+
+.sentiment-badge {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.actions button {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    margin-right: 8px;
+    font-size: 13px;
+}
+
+.actions button:hover {
+    color: white;
+    text-decoration: underline;
+}
