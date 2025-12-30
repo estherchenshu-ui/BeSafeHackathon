@@ -1,10 +1,9 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import styles from './CommentCard.module.css';
 
 const CommentCard = ({ 
     username, 
-    avatarUrl,  // <--- הוספנו מקום לקבלת תמונה מהבאקנד
+    avatarUrl, 
     time, 
     text, 
     impact, 
@@ -14,19 +13,15 @@ const CommentCard = ({
 }) => {
 
   return (
-    <div className={styles.card}> {/* בלי סיווג צבעים כרגע, זה למשימה הבאה */}
+    <div className={`${styles.card} ${styles[sentiment] || ''}`}>
       
       <div className={styles.header}>
         <div className={styles.userInfo}>
-          
-          {/* --- הטיפול באווטר (לוגיקה) --- */}
           <div className={styles.avatar}>
             {avatarUrl ? (
-              // אם יש תמונה - מציגים אותה בתוך העיגול
               <img src={avatarUrl} alt={username} className={styles.avatarImage} />
             ) : (
-              // אם אין תמונה - מציגים אות
-              username ? username.charAt(0).toUpperCase() : '?'
+             username ? (username.startsWith('@') ? username.charAt(1).toUpperCase() : username.charAt(0).toUpperCase()) : '?'
             )}
           </div>
           
@@ -37,7 +32,7 @@ const CommentCard = ({
         </div>
 
         <div className={styles.impact}>
-          {impact} נק'
+          {impact} נק&apos;
         </div>
       </div>
 
@@ -46,16 +41,29 @@ const CommentCard = ({
       </div>
 
       <div className={styles.footer}>
-        {/* Badge - כרגע רק טקסט, העיצוב הצבעוני שייך למשימה הבאה */}
-        <span className={styles.badge}>
-            {sentiment === 'negative' ? 'פוגעני' : 'תקין'}
+        <span className={`${styles.badge} ${styles['badge-' + sentiment] || ''}`}>
+            {sentiment === 'negative' ? 'פוגעני' : (sentiment === 'positive' ? 'חיובי' : 'ניטרלי')}
         </span>
         
-        {/* --- הטיפול בכפתורים (לוגיקה) --- */}
+        {/* 👇 כאן השדרוג: אייקונים במקום מילים */}
         <div className={styles.actions}>
-          {/* הפעולה היא פשוט לקרוא לפונקציה שהתקבלה מבחוץ */}
-          <button onClick={onDelete} className={styles.btn}>מחק</button>
-          <button onClick={onBlock} className={styles.btn}>חסום</button>
+          
+          {/* כפתור מחיקה (אייקון פח) */}
+          <button onClick={onDelete} className={styles.actionBtn} title="מחק תגובה">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </button>
+
+          {/* כפתור חסימה (אייקון חסימה/מגן) */}
+          <button onClick={onBlock} className={`${styles.actionBtn} ${styles.blockBtn}`} title="חסום משתמש">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+            </svg>
+          </button>
+          
         </div>
       </div>
 
@@ -65,7 +73,7 @@ const CommentCard = ({
 
 CommentCard.propTypes = {
   username: PropTypes.string.isRequired,
-  avatarUrl: PropTypes.string, // לא חובה (יכול להיות ריק)
+  avatarUrl: PropTypes.string,
   time: PropTypes.string.isRequired,
   text: PropTypes.string.isRequired,
   impact: PropTypes.number.isRequired,
