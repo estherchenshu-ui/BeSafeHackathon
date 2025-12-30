@@ -1,40 +1,77 @@
+import React from 'react';
+import PropTypes from 'prop-types';
 import styles from './CommentCard.module.css';
 
-const CommentCard = () => {
+const CommentCard = ({ 
+    username, 
+    avatarUrl,  // <--- הוספנו מקום לקבלת תמונה מהבאקנד
+    time, 
+    text, 
+    impact, 
+    sentiment, 
+    onBlock, 
+    onDelete 
+}) => {
+
   return (
-    // משתמשים ב-styles כדי לגשת למחלקות ב-CSS
-    // שימי לב: בגלל שהשמות ב-CSS הם עם מקף, משתמשים בסוגריים מרובעים
-    <div className={`${styles['comment-card']} ${styles.negative}`}>
+    <div className={styles.card}> {/* בלי סיווג צבעים כרגע, זה למשימה הבאה */}
       
-      {/* קומה 1: ראש הכרטיס */}
-      <div className={styles['card-header']}>
-        <div className={styles['user-group']}>
-          <div className={styles.avatar}>ת</div>
-          <div className={styles['user-text']}>
-            <span className={styles.username}>@troll_99</span>
-            <span className={styles.time}>לפני 5 דק'</span>
+      <div className={styles.header}>
+        <div className={styles.userInfo}>
+          
+          {/* --- הטיפול באווטר (לוגיקה) --- */}
+          <div className={styles.avatar}>
+            {avatarUrl ? (
+              // אם יש תמונה - מציגים אותה בתוך העיגול
+              <img src={avatarUrl} alt={username} className={styles.avatarImage} />
+            ) : (
+              // אם אין תמונה - מציגים אות
+              username ? username.charAt(0).toUpperCase() : '?'
+            )}
+          </div>
+          
+          <div>
+            <div className={styles.username}>{username}</div>
+            <div className={styles.time}>{time}</div>
           </div>
         </div>
-        <div className={styles.impact}>-5 נק'</div>
+
+        <div className={styles.impact}>
+          {impact} נק'
+        </div>
       </div>
 
-      {/* קומה 2: הטקסט */}
-      <div className={styles['comment-text']}>
-        לדעתי הסרטון הזה ממש גרוע ומביך.
+      <div className={styles.text}>
+        {text}
       </div>
 
-      {/* קומה 3: תחתית */}
-      <div className={styles['card-footer']}>
-        <span className={styles['sentiment-badge']}>⚠️ פוגעני</span>
+      <div className={styles.footer}>
+        {/* Badge - כרגע רק טקסט, העיצוב הצבעוני שייך למשימה הבאה */}
+        <span className={styles.badge}>
+            {sentiment === 'negative' ? 'פוגעני' : 'תקין'}
+        </span>
         
+        {/* --- הטיפול בכפתורים (לוגיקה) --- */}
         <div className={styles.actions}>
-          <button>מחק</button>
-          <button>חסום</button>
+          {/* הפעולה היא פשוט לקרוא לפונקציה שהתקבלה מבחוץ */}
+          <button onClick={onDelete} className={styles.btn}>מחק</button>
+          <button onClick={onBlock} className={styles.btn}>חסום</button>
         </div>
       </div>
 
     </div>
   );
+};
+
+CommentCard.propTypes = {
+  username: PropTypes.string.isRequired,
+  avatarUrl: PropTypes.string, // לא חובה (יכול להיות ריק)
+  time: PropTypes.string.isRequired,
+  text: PropTypes.string.isRequired,
+  impact: PropTypes.number.isRequired,
+  sentiment: PropTypes.string,
+  onBlock: PropTypes.func,
+  onDelete: PropTypes.func
 };
 
 export default CommentCard;

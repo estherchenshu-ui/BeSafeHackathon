@@ -1,90 +1,111 @@
-/* CommentCard.module.css */
-
-.comment-card {
-    background-color: #161622;
-    color: white;
-    padding: 16px;
+.card {
+    background-color: #1e1e1e; /* רקע כהה */
+    color: #e0e0e0;             /* טקסט בהיר */
     border-radius: 12px;
+    padding: 16px;
     width: 100%;
-    max-width: 400px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    border-right: 4px solid transparent;
-    font-family: sans-serif;
-    margin-bottom: 15px;
-    direction: rtl; /* חשוב לעברית */
+    max-width: 450px;           /* שלא יהיה רחב מדי */
+    margin-bottom: 16px;        /* רווח בין כרטיסים */
+    border-right: 5px solid transparent; /* הכנה לצבע בצד */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 
-.comment-card.negative {
-    border-right-color: #ef4444;
-    background: linear-gradient(to left, rgba(239, 68, 68, 0.1), #161622);
-}
+/* סגנונות בסיסיים לפי סנטימנט (כדי שהבאדג' והבורדר יעבדו) */
+.positive { border-right-color: #10b981; }
+.negative { border-right-color: #ef4444; }
+.neutral  { border-right-color: #f59e0b; }
 
-.card-header {
+/* --- Header --- */
+.header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 12px;
 }
 
-.user-group {
+.userInfo {
     display: flex;
+    gap: 12px;
     align-items: center;
-    gap: 10px;
 }
 
 .avatar {
     width: 40px;
     height: 40px;
-    background-color: #555;
-    border-radius: 50%;
+    background-color: #333;
+    border-radius: 50%;         /* הופך את הריבוע לעיגול */
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     font-weight: bold;
+    color: white;
 }
 
-.user-text {
-    display: flex;
-    flex-direction: column;
+.username {
+    font-weight: bold;
+    font-size: 0.95rem;
 }
 
-.username { font-weight: bold; font-size: 14px; }
-.time { font-size: 12px; color: #888; }
-.impact { font-weight: bold; color: #ef4444; }
-
-.comment-text {
-    margin-bottom: 15px;
-    line-height: 1.5;
-    font-size: 15px;
+.time {
+    font-size: 0.75rem;
+    color: #888;
 }
 
-.card-footer {
+.impact {
+    font-weight: bold;
+    font-size: 0.9rem;
+    direction: ltr; /* כדי שהפלוס/מינוס יהיה בצד הנכון */
+}
+
+/* --- Body --- */
+.text {
+    margin-bottom: 16px;
+    line-height: 1.4;
+}
+
+/* --- Footer --- */
+.footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-top: 1px solid #333;
-    padding-top: 10px;
+    padding-top: 12px;
 }
 
-.sentiment-badge {
-    background-color: rgba(239, 68, 68, 0.2);
-    color: #ef4444;
+.badge {
     padding: 4px 8px;
     border-radius: 6px;
-    font-size: 12px;
+    font-size: 0.75rem;
     font-weight: bold;
 }
 
-.actions button {
-    background: none;
-    border: none;
-    color: #888;
-    cursor: pointer;
-    margin-right: 8px;
-    font-size: 13px;
+.badge-positive { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+.badge-negative { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+.badge-neutral  { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+
+.actions {
+    display: flex;
+    gap: 8px;
 }
 
-.actions button:hover {
+.btn {
+    background: transparent;
+    border: 1px solid #555;
+    color: #bbb;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.btn:hover {
+    background: #333;
     color: white;
-    text-decoration: underline;
+}
+/* מוודא שהתמונה נכנסת בדיוק לתוך העיגול */
+.avatarImage {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover; /* שומר על פרופורציות התמונה */
 }
