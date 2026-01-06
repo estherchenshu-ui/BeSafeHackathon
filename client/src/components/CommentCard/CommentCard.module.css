@@ -1,165 +1,101 @@
-.card {
-  /* משתנים */
-  --bg-card: rgba(30, 30, 35, 0.85); 
-  --text-primary: #ffffff;
-  --text-secondary: #a1a1aa;
-  
-  --positive: #10b981;
-  --negative: #ef4444;
-  --neutral: #f59e0b;
-  
-  /* --- תיקון גודל (הגבלת רוחב) --- */
-  width: 100%;             
-  max-width: 550px;        /* 👈 זה ימנע ממנו להיות ענק! גודל סטנדרטי של פיד */
-  min-height: 160px;       
-  max-height: 300px;      
-  
-  display: flex;
-  flex-direction: column;
-  
-  /* עיצוב */
-  background: var(--bg-card);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 18px;
-  margin-bottom: 20px;
-  
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-right: 4px solid transparent; 
-  
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
-
-  /* --- הוספת האנימציה (Task 8) --- */
-  animation: slideIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); /* 👈 אנימציית כניסה חלקה */
+.commentCard {
+  background-color: #121217; /* רקע כהה כפי שהוגדר ב-Design Doc [cite: 63] */
+  border-radius: 12px;
+  padding: 16px;
+  width: 100%;
+  max-width: 550px;
+  direction: rtl; /* יישור מימין לשמאל עבור עברית */
+  font-family: sans-serif;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
 }
 
-/* שאר העיצוב נשאר זהה... */
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-}
-
-.text {
-  flex-grow: 1;
-  overflow-y: auto;
-  margin-bottom: 16px;
-  padding-left: 8px;
-  line-height: 1.5;
-  color: #e2e8f0;
-  scrollbar-width: thin;
-  scrollbar-color: #555 transparent;
-}
-
-.positive {
-  border-right-color: var(--positive);
-  background: linear-gradient(270deg, rgba(16, 185, 129, 0.1) 0%, var(--bg-card) 100%);
-}
-
-.negative {
-  border-right-color: var(--negative);
-  background: linear-gradient(270deg, rgba(239, 68, 68, 0.1) 0%, var(--bg-card) 100%);
-}
-
-.neutral {
-  border-right-color: var(--neutral);
-  background: linear-gradient(270deg, rgba(245, 158, 11, 0.1) 0%, var(--bg-card) 100%);
-}
-
-.header {
+.cardHeader {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 12px;
 }
 
-.userInfo {
+.rightSection {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
 .avatar {
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
+  /* גרדיאנט ורוד-טורקיז של TikTok [cite: 64, 65] */
+  background: linear-gradient(135deg, #fe2c55, #25f4ee);
   border-radius: 50%;
-  background: #333;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   color: white;
-  border: 1px solid rgba(255,255,255,0.2);
-  overflow: hidden;
+  font-weight: bold;
 }
 
-.avatarImage { width: 100%; height: 100%; object-fit: cover; }
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+}
 
-.username { font-weight: bold; font-size: 0.95rem; }
-.time { font-size: 0.75rem; color: var(--text-secondary); }
-.impact { font-weight: bold; font-family: monospace; }
+.username {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.time {
+  color: #86878b;
+  font-size: 0.75rem;
+}
+
+/* הגדרות תגית (Badge) [cite: 72] */
+.badge {
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  border: 1px solid transparent;
+}
+
+/* צבעים לפי סנטימנט [cite: 66, 67] */
+.positive .badge { color: #10b981; border-color: #10b981; background: rgba(16, 185, 129, 0.1); }
+.negative .badge { color: #ef4444; border-color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+.neutral .badge { color: #f59e0b; border-color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+
+.content {
+  margin-right: 50px; /* הזחה מתחת לשם המשתמש בצד ימין */
+  text-align: right;
+}
+
+.commentText {
+  color: #ffffff;
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
 
 .footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px solid rgba(255,255,255,0.1);
-  padding-top: 12px;
-  margin-top: auto; 
+  margin-top: 10px;
 }
 
-.badge {
-  font-size: 0.7rem;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-weight: 600;
+.heartIcon {
+  color: #fe2c55;
+  font-size: 0.9rem;
+  opacity: 0.8;
 }
 
-.badge-positive { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-.badge-negative { background: rgba(239, 68, 68, 0.2); color: #f87171; }
-.badge-neutral { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
-
-.actions {
-  display: flex;
-  gap: 8px;
+.impactRow {
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
-.actionBtn {
-  background: rgba(255, 255, 255, 0.05); /* רקע שקוף עדין */
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: var(--text-secondary);
-  
-  /* הופך את הכפתור לריבוע/עיגול מושלם לאייקון */
-  width: 36px;
-  height: 36px;
-  border-radius: 50%; /* עיגול מלא */
-  
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.actionBtn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  transform: scale(1.1); /* הגדלה קטנה כשעוברים מעל */
-}
-
-/* עיצוב מיוחד לכפתור חסימה (אדום בהובר) */
-.blockBtn:hover {
-  background: rgba(239, 68, 68, 0.2);
-  border-color: rgba(239, 68, 68, 0.5);
-  color: #fca5a5;
-}
-
-/* --- הגדרת האנימציה עצמה (למטה בסוף הקובץ) --- */
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(30px) scale(0.95); /* מתחיל קצת למטה וקטן */
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1); /* מגיע למקום בגודל טבעי */
-  }
-}
+.posImpact { color: #10b981; }
+.negImpact { color: #ef4444; }
+.neutImpact { color: #86878b; }
