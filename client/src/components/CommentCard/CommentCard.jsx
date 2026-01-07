@@ -1,85 +1,49 @@
-import PropTypes from 'prop-types';
 import styles from './CommentCard.module.css';
 
-const CommentCard = ({ 
-    username, 
-    avatarUrl, 
-    time, 
-    text, 
-    impact, 
-    sentiment, 
-    onBlock, 
-    onDelete 
-}) => {
+const CommentCard = ({ comment }) => {
+  // קביעת סוג הסנטימנט לצורך עיצוב (positive/negative/neutral)
+  const sentimentClass = styles[comment.sentiment] || '';
 
   return (
-    <div className={`${styles.card} ${styles[sentiment] || ''}`}>
-      
-      <div className={styles.header}>
-        <div className={styles.userInfo}>
+    <div className={`${styles.commentCard} ${sentimentClass}`}>
+      <div className={styles.cardHeader}>
+        {/* צד שמאל: אווטר ופרטי משתמש */}
+        <div className={styles.leftSection}>
           <div className={styles.avatar}>
-            {avatarUrl ? (
-              <img src={avatarUrl} alt={username} className={styles.avatarImage} />
+            {/* לוגיקה לשליפת האות הראשונה מה-username והפיכתה לאות גדולה */}
+            {comment.username ? comment.username.charAt(0).toUpperCase() : 'U'}
+          </div>
+          <div className={styles.userInfo}>
+            <span className={styles.username}>{comment.username}</span>
+            <span className={styles.time}>{comment.time || 'עכשיו'}</span>
+          </div>
+        </div>
+
+        {/* צד ימין: תגית סנטימנט (Badge) */}
+        <div className={`${styles.badge} ${sentimentClass}`}>
+          {comment.sentiment === 'positive' ? '💚 חיובי' : 
+           comment.sentiment === 'negative' ? '⚠️ פוגעני' : '💬 ניטרלי'}
+        </div>
+      </div>
+
+      <div className={styles.content}>
+        <p className={styles.commentText}>{comment.text}</p>
+        
+        <div className={styles.footer}>
+          <span className={styles.heartIcon}>❤️</span>
+          <div className={styles.impactRow}>
+            {comment.impact > 0 ? (
+              <span className={styles.posImpact}>הציון עלה ב-{comment.impact} נקודות 📈</span>
+            ) : comment.impact < 0 ? (
+              <span className={styles.negImpact}>הציון ירד ב-{Math.abs(comment.impact)} נקודות 📉</span>
             ) : (
-             username ? (username.startsWith('@') ? username.charAt(1).toUpperCase() : username.charAt(0).toUpperCase()) : '?'
+              <span className={styles.neutImpact}>ללא שינוי בציון ↔️</span>
             )}
           </div>
-          
-          <div>
-            <div className={styles.username}>{username}</div>
-            <div className={styles.time}>{time}</div>
-          </div>
-        </div>
-
-        <div className={styles.impact}>
-          {impact} נק&apos;
         </div>
       </div>
-
-      <div className={styles.text}>
-        {text}
-      </div>
-
-      <div className={styles.footer}>
-        <span className={`${styles.badge} ${styles['badge-' + sentiment] || ''}`}>
-            {sentiment === 'negative' ? 'פוגעני' : (sentiment === 'positive' ? 'חיובי' : 'ניטרלי')}
-        </span>
-        
-        {/* 👇 כאן השדרוג: אייקונים במקום מילים */}
-        <div className={styles.actions}>
-          
-          {/* כפתור מחיקה (אייקון פח) */}
-          <button onClick={onDelete} className={styles.actionBtn} title="מחק תגובה">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="3 6 5 6 21 6"></polyline>
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-            </svg>
-          </button>
-
-          {/* כפתור חסימה (אייקון חסימה/מגן) */}
-          <button onClick={onBlock} className={`${styles.actionBtn} ${styles.blockBtn}`} title="חסום משתמש">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
-            </svg>
-          </button>
-          
-        </div>
-      </div>
-
     </div>
   );
-};
-
-CommentCard.propTypes = {
-  username: PropTypes.string.isRequired,
-  avatarUrl: PropTypes.string,
-  time: PropTypes.string.isRequired,
-  text: PropTypes.string.isRequired,
-  impact: PropTypes.number.isRequired,
-  sentiment: PropTypes.string,
-  onBlock: PropTypes.func,
-  onDelete: PropTypes.func
 };
 
 export default CommentCard;
