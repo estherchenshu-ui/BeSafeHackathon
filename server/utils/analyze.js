@@ -1,13 +1,11 @@
 import { positiveWords, negativeWords, emojiScores, negationWords } from './words.js';
 import { analyzeWithAI } from './aiProvider.js';
 
-// פונקציית עזר לניקוי וסידור הטקסט
 function normalize(text) {
     if (!text) return "";
     return text.toLowerCase().replace(/\s+/g, ' ').trim();
 }
 
-// פונקציית עזר לבדיקת מילות שלילה (כמו "לא", "בלי")
 function hasNegation(words, index) {
     const start = Math.max(0, index - 2);
     const prevWords = words.slice(start, index);
@@ -15,7 +13,6 @@ function hasNegation(words, index) {
 }
 
 export async function analyzeComment(text) {
-    // 1. הגנה ראשונית: אם הטקסט ריק או לא תקין, מחזירים תוצאה ניטרלית מיד
     if (!text || typeof text !== 'string' || text.trim() === '') {
         return { sentiment: 'neutral', impact: 0 };
     }
@@ -25,24 +22,21 @@ export async function analyzeComment(text) {
     let score = 0;
     let identified = false;
 
-    // 2. ניתוח מילים (לוקאלי)
+    // ניתוח מילים
     words.forEach((word, i) => {
-        // מנקים סימני פיסוק (כדי ש"מדהים!" יזוהה כ"מדהים")
         const cleanWord = word.replace(/[^\p{L}]/gu, ''); 
         
         if (positiveWords[cleanWord]) {
-            // אם יש שלילה ("לא מדהים") -> הופך לשלילי, אחרת חיובי
             score += hasNegation(words, i) ? -positiveWords[cleanWord] : positiveWords[cleanWord];
             identified = true;
         }
         else if (negativeWords[cleanWord]) {
-            // אם יש שלילה ("לא גרוע") -> הופך ל-0 (ניטרלי), אחרת שלילי
             score += hasNegation(words, i) ? 0 : negativeWords[cleanWord];
             identified = true;
         }
     });
 
-    // 3. ניתוח אימוג'ים (לוקאלי)
+    // ניתוח אימוג'ים
     const emojiRegex = /\p{Emoji}/gu;
     const emojisFound = text.match(emojiRegex) || [];
     emojisFound.forEach(emoji => {
@@ -52,64 +46,68 @@ export async function analyzeComment(text) {
         }
     });
 
-    // 4. החלטה חכמה מתי לעבור ל-AI
+    // --- לוגיקה משופרת לזיהוי מתי צריך AI ---
     
-    // תנאי א': לא זיהינו שום מילה מהמילון
+    // 1. לא זיהינו כלום
     const noWordsFound = !identified;
     
-    // תנאי ב': הציון גבולי (בין -2 ל-2) ויש מספיק מילים (אולי פספסנו הקשר)
-    const isAmbiguous = (score >= -2 && score <= 2 && words.length >= 4);
+    // 2. גבולי: ציון נמוך (בין -3 ל 3) ויש הרבה מילים (אולי פספסנו הקשר)
+    const isAmbiguous = (score >= -3 && score <= 3 && words.length >= 4);
 
-    // תנאי ג' (התיקון החדש): הציון גבוה מאוד (מעל 5) אבל המשפט קצר (פחות מ-4 מילים)
-    // זה חשוד כסרכזם כמו "גאון הדור" או "ממש יופי"
-    const isSuspiciouslyShort = (score > 5 && words.length < 4);
+    // 3. חשד לסרכזם: ציון חיובי כלשהו (אפילו 2 ומעלה!) ומשפט קצר.
+    // זה יתפוס את "יופי של עבודה" (ציון 3, אורך 3)
+    const isSuspiciouslyShort = (score >= 2 && words.length <= 5);
 
     const needsAI = noWordsFound || isAmbiguous || isSuspiciouslyShort;
     
+    // משתנה לדיבוג - כדי שתדעי בטסט אם זה עבר דרך AI
+    let usedAI = false; 
+
     if (needsAI) {
         try {
-            const prompt = `
-            Task: Analyze this Hebrew comment from TikTok: "${text}".
+          const prompt = `
+            Task: Analyze this Hebrew comment: "${text}".
             
-            Your specific goal is to detect SARCASM and CYBERBULLYING.
+            1. DETECT SARCASM: 
+               - Phrases like "יופי של עבודה", "ממש גאון", "כל הכבוד באמת" are often SARCASTIC in short comments.
+               - If sarcasm is detected -> Score MUST be NEGATIVE (e.g., -5).
             
-            Guidance for Hebrew Slang:
-            - Be careful with words like "גאון" (genius), "יופי" (great), "בהצלחה" (good luck), "חי בסרט" (delusional).
-            - If positive words are used in a short, dismissive way, it is likely SARCASM.
-            - If sarcasm is detected, the score MUST be NEGATIVE (e.g., -5).
-            
-            Score range: -10 (very toxic/hurtful) to 10 (very supportive/loving).
+            2. DETECT NEUTRALITY:
+               - Simple questions (e.g., "איפה זה?", "מאיפה החולצה?") are NEUTRAL -> Score 0.
+               - Simple facts (e.g., "אני בעבודה") are NEUTRAL -> Score 0.
+               - Polite requests are NEUTRAL -> Score 0.
+
+            3. Sentiment Score:
+               - Range: -10 (Toxic) to 10 (Love/Support).
+               - 0 is for Neutral/Questions.
             
             Return ONLY JSON: {"score": number}`;
             
             const aiRaw = await analyzeWithAI(prompt);
-            
-            // ניקוי התשובה מסימנים מיותרים ופירסור ה-JSON
             const cleanJson = aiRaw.replace(/```json|```/g, '').trim();
             const aiResult = JSON.parse(cleanJson);
             
-            // מעדכנים את הציון לפי ה-AI
             score = aiResult.score;
+            usedAI = true;
             
         } catch (e) { 
-            // במקרה של שגיאה ב-AI, ממשיכים עם הציון הלוקאלי שחושב למעלה
-            console.log("AI analysis failed, using local score:", e.message); 
+            console.error("❌ AI Error Details:", e.message);
         }
     }
 
-    // 5. חישובים סופיים להחזרה (ללא החזרת ה-score הגולמי)
+    // --- חישובים סופיים ---
     
-    // קביעת הסנטימנט (המילה) לפי הציון הסופי
     let sentiment = 'neutral';
-    if (score >= 2) sentiment = 'positive';
-    if (score <= -2) sentiment = 'negative';
+    // העליתי את הרף ל-3. כלומר: צריך להיות ממש חיובי כדי לקבל ירוק.
+    // סתם "עבודה" לא יספיק.
+    if (score >= 3) sentiment = 'positive';
+    if (score <= -2) sentiment = 'negative'; // שלילי נשאר רגיש
 
-    // חישוב האימפקט: חלוקה ב-2 כדי למתן את התנודות בגרף הבריאות
     let impact = score / 2;
 
-    // החזרה פשוטה של מה שצריך לתצוגה ול-DB
     return { 
-        sentiment: sentiment,  
-        impact: impact         
+        sentiment,  
+        impact,
+        debugSource: usedAI ? 'AI' : 'Local' // הוספתי את זה רק בשביל הטסט שלך!
     };
 }
