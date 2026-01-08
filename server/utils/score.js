@@ -1,20 +1,27 @@
-// utils/score.js
+// server/utils/score.js
 
 /**
  * מחשב את הציון הסופי.
- * מתחילים מ-80 כדי לאפשר עליה וירידה דינמית.
+ * מתחילים מ-80 (ציון "טוב מאוד").
  */
-export function calculateHealthScore(totalImpact) {
-    const BASE_SCORE = 80; // נקודת ההתחלה
+export function calculateHealthScore(totalImpactSum) {
+    const BASE_SCORE = 80; 
     
-    let currentScore = BASE_SCORE + totalImpact;
+    // חישוב פשוט: 80 ועוד ההשפעה המצטברת
+    let currentScore = BASE_SCORE + totalImpactSum;
 
-    // שומרים על גבולות הגיוניים (0 עד 100)
-    return Math.max(0, Math.min(100, currentScore));
+    // מגבלות: לא פחות מ-0 ולא יותר מ-100
+    return Math.floor(Math.max(0, Math.min(100, currentScore)));
 }
 
 export function getStatus(score) {
-    if (score >= 80) return 'Safe';      // ירוק: הכל מצוין
-    if (score >= 60) return 'Warning';   // כתום: צריך לשים לב
-    return 'Danger';                     // אדום: סכנה מיידית
+    // התיקון הסופי:
+    // 80 ומעלה = ירוק (כדי שההתחלה תהיה ירוקה)
+    if (score >= 80) return { label: 'Safe', color: '#4CAF50' };
+    
+    // 60 עד 79 = כתום
+    if (score >= 60) return { label: 'Warning', color: '#FFC107' };
+    
+    // מתחת ל-60 = אדום
+    return { label: 'Danger', color: '#F44336' };
 }
