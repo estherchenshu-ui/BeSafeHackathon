@@ -1,14 +1,16 @@
 .commentCard {
-  background-color: #121217; /* רקע כהה כפי שהוגדר ב-Design Doc [cite: 63] */
+  background-color: #121217;
   border-radius: 12px;
   padding: 16px;
   width: 100%;
-  max-width: 550px;
-  direction: rtl; /* יישור מימין לשמאל עבור עברית */
+  max-width: 720px;   /* ⭐ שליטה על רוחב העמודה */
+  direction: rtl;
   font-family: sans-serif;
   margin-bottom: 15px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  box-sizing: border-box;
 }
+
 
 .cardHeader {
   display: flex;
