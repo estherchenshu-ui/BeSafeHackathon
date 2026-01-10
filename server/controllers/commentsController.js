@@ -1,60 +1,82 @@
 // server/controllers/commentsController.js
 import Comment from '../models/Comment.js';
+import { analyzeComment } from '../utils/analyze.js'; 
+import { calculateHealthScore, getStatus } from '../utils/score.js';
 
-// 👇 ייבוא הפונקציות של בת 4 (מהתיקייה utils)
-import { analyze } from '../utils/analyze.js'; 
-import { calculateScore, getStatus } from '../utils/score.js'; 
-
-// 1. הוספת תגובה (POST /api/analyze)
+// 1. הוספת תגובה (POST)
 export const addComment = async (req, res) => {
   try {
     const { username, text } = req.body;
+    
+    // ניתוח הטקסט (כולל החלת הקנס אם צריך)
+    const analysisResult = await analyzeComment(text); 
 
-    // שלב א: שליחה לבת 4 לניתוח הטקסט
-    // היא מחזירה לך: { sentiment: 'negative', score: -5 }
-    const analysisResult = analyze(text); 
-
-    // שלב ב: יצירת רשומה ל-MongoDB עם התוצאות שלה
+    // יצירת הרשומה לשמירה
     const newComment = new Comment({
       username: username || 'אנונימי',
       text: text,
-      sentiment: analysisResult.sentiment, // בת 4 קבעה אם זה חיובי/שלילי
-      score: analysisResult.score || 0     // בת 4 קבעה כמה זה משפיע
+      sentiment: analysisResult.sentiment,
+      score: analysisResult.score // הציון הזה כבר כולל את ה-x1.5 אם היה שלילי
     });
 
+    // שמירה בפועל
     await newComment.save();
-    res.status(201).json(newComment);
+    
+    // החזרה לפוסטמן (כולל שדות דיבוג שלא נשמרו ב-DB)
+    res.status(201).json({
+      ...newComment.toObject(),
+      source_CHECK: analysisResult.debugSource, // כדי שתדעי אם זה AI
+      debug_final_score: analysisResult.score   // כדי לוודא את הניקוד
+    });
 
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// 2. סטטיסטיקות (GET /api/stats)
+// 2. קבלת סטטיסטיקה (GET)
 export const getStats = async (req, res) => {
   try {
-    // שלב א: את (בת 3) מביאה את המספרים מה-DB
-    // זה התפקיד שלך כי את אחראית על הנתונים
+    // שלב א: סכימת כל הניקוד מהדאטה בייס
+    const aggregation = await Comment.aggregate([
+      { 
+        $group: { 
+          _id: null, 
+          totalSum: { $sum: "$score" } // סוכם את הכל (חיובי ושלילי)
+        } 
+      }
+    ]);
+
+    // אם אין תגובות, הסכום הוא 0
+    const totalImpactSum = aggregation.length > 0 ? aggregation[0].totalSum : 0;
+
+    // שלב ב: חישוב הציון הכללי (80 + הסכום)
+    const healthScore = calculateHealthScore(totalImpactSum);
+    const status = getStatus(healthScore);
+
+    // שלב ג: הבאת נתונים לתצוגה גרפית (כמויות)
     const total = await Comment.countDocuments();
     const positive = await Comment.countDocuments({ sentiment: 'positive' });
     const negative = await Comment.countDocuments({ sentiment: 'negative' });
     const neutral = total - positive - negative;
-
-    // שלב ב: את שולחת את המספרים לבת 4 לחישוב הציון המשוקלל
-    // את לא צריכה לדעת את הנוסחה, רק לקרוא לפונקציה שלה
-    const healthScore = calculateScore(total, positive, negative);
     
-    // אופציונלי: לקבל ממנה גם סטטוס מילולי (למשל "Warning")
-    const status = getStatus(healthScore);
+    // תגובות מהיום
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const commentsToday = await Comment.countDocuments({ timestamp: { $gte: startOfDay } });
 
-    // שלב ג: מחזירה הכל לפרונט
     res.json({
       total,
-      positive,
-      negative,
-      neutral,
-      score: healthScore,
-      status: status
+      today: commentsToday,
+      breakdown: { positive, negative, neutral },
+      percentages: {
+          positive: total > 0 ? Math.round((positive / total) * 100) : 0,
+          negative: total > 0 ? Math.round((negative / total) * 100) : 0
+      },
+      healthScore, 
+      status,
+      // שדה בונוס לדיבוג - הסכום הגולמי
+      debug_sum: totalImpactSum 
     });
 
   } catch (error) {
@@ -62,10 +84,10 @@ export const getStats = async (req, res) => {
   }
 };
 
-// 3. היסטוריה (נשאר אותו דבר)
+// 3. היסטוריה (רגיל)
 export const getHistory = async (req, res) => {
   try {
-    const comments = await Comment.find().sort({ timestamp: -1 });
+    const comments = await Comment.find().sort({ timestamp: -1 }).limit(20);
     res.json(comments);
   } catch (error) {
     res.status(500).json({ message: error.message });

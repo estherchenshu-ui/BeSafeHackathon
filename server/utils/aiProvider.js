@@ -1,24 +1,22 @@
-import { GoogleGenAI } from '@google/genai';
-import dotenv from 'dotenv';
+import OpenAI from "openai";
+import dotenv from "dotenv";
 
 dotenv.config();
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
-console.log("AI Provider initialized with Gemini model.");
+console.log("AI Provider initialized with OpenAI.");
 
 export async function analyzeWithAI(prompt) {
-  const response = await ai.models.generateContent({
-    model: 'gemini-flash-latest',
-    contents: [
-      {
-        role: 'user',
-        parts: [{ text: prompt }],
-      },
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o-mini", // זול ומהיר, מצוין ל-sentiment
+    messages: [
+      { role: "user", content: prompt }
     ],
+    temperature: 0.2,
   });
 
-  return response.text;
+  return response.choices[0].message.content;
 }

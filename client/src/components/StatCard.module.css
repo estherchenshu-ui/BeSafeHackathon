@@ -1,0 +1,61 @@
+/* משתני CSS גלובליים - חשוב להגדיר אותם! */
+:root {
+  --positive: #4ade80;  /* ירוק - לערכים חיוביים */
+  --negative: #f87171;  /* אדום - לערכים שליליים */
+}
+
+.statCard {
+  background: #2e2e36; /* רקע שקוף כהה */
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  min-width: 100px;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* אפקט hover */
+.statCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: #ffffff; /* צבע ברירת מחדל */
+}
+
+.label {
+  font-size: 0.75rem;
+  color: #a0a0b0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* עיצובים משתנים לפי סוג הנתון */
+.positive .value {
+  color: var(--positive);
+}
+
+.negative .value {
+  color: var(--negative);
+}
+
+.neutral .value {
+  color: #25f4ee;
+}
+
+/* גבולות צבעוניים לפי סוג */
+.positive {
+  border-color: rgba(74, 222, 128, 0.3);
+}
+
+.negative {
+  border-color: rgba(248, 113, 113, 0.3);
+}
+
+.neutral {
+  border-color: rgba(37, 244, 238, 0.3);
+}
