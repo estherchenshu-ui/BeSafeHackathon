@@ -1,0 +1,95 @@
+.container {
+  background: #14141f; /* צבע כרטיס כהה */
+  border-radius: 20px;
+  padding: 1.5rem;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  max-width: 300px;
+}
+
+.title {
+  font-size: 0.9rem;
+  color: #a0a0b0;
+  margin-bottom: 1.5rem;
+}
+
+.circleWrapper {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin: 0 auto 1.5rem;
+}
+
+.svg {
+  transform: rotate(-90deg); /* מסובב את המעגל שיתחיל מלמעלה */
+}
+
+.bgCircle {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.1);
+  stroke-width: 12;
+}
+
+.progressCircle {
+  fill: none;
+  stroke: #fe2c55; /* צבעTikTok ורוד - אפשר לשנות לגרדיאנט בהמשך */
+  stroke-width: 12;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s ease-in-out,stroke 0.5s ease;;
+}
+
+.progressCircle.good {
+  stroke: #10b981; /* ירוק */
+}
+
+.progressCircle.warning {
+  stroke: #f59e0b; /* כתום/צהוב */
+}
+
+.progressCircle.danger {
+  stroke: #ef4444; /* אדום */
+}
+
+.scoreValue {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.number {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #797985;
+  display: inline-block; 
+  transition: color 0.3s ease;
+}
+
+.pop {
+  animation: popNumber 0.3s ease-out;
+}
+
+@keyframes popNumber {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); } /* גדילה ב-8% */
+  100% { transform: scale(1); }
+}
+
+.label {
+  font-size: 0.8rem;
+  color: #a0a0b0;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.good { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.warning { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+.danger { background: rgba(239, 68, 68, 0.15); color: #ef4444; }

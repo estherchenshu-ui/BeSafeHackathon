@@ -1,5 +1,5 @@
 // client/src/components/TrendChart.jsx
-import React from 'react';
+import PropTypes from 'prop-types';
 import './TrendChart.css';
 
 const TrendChart = ({ data }) => {
@@ -16,10 +16,10 @@ const TrendChart = ({ data }) => {
   return (
     <div className="trend-card">
       <h3>📈 מגמת ציון - 10 דקות אחרונות</h3>
-      
+
       <div className="trend-chart">
         {chartData.map((score, index) => (
-          <div 
+          <div
             key={index}
             className={`trend-bar ${getStatusClass(score)}`}
             style={{ height: `${score}%` }} // הגובה לפי הציון באחוזים
@@ -29,11 +29,15 @@ const TrendChart = ({ data }) => {
       </div>
 
       <div className="trend-labels">
-        <span>10 דק' קודם</span>
+        <span>10 דק&apos; קודם</span>
         <span>עכשיו</span>
       </div>
     </div>
   );
+};
+
+TrendChart.propTypes = {
+  data: PropTypes.array,
 };
 
 export default TrendChart;

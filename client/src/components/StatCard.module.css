@@ -1,61 +1,55 @@
-/* משתני CSS גלובליים - חשוב להגדיר אותם! */
-:root {
-  --positive: #4ade80;  /* ירוק - לערכים חיוביים */
-  --negative: #f87171;  /* אדום - לערכים שליליים */
-}
-
 .statCard {
-  background: #2e2e36; /* רקע שקוף כהה */
-  border-radius: 12px;
-  padding: 1rem;
-  text-align: center;
-  min-width: 100px;
-  border: 1px solid rgba(0, 0, 0, 0.5);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 6px 14px;
+  border-radius: 999px; /* עגול כמו תגית */
+  font-size: 14px;
+  font-weight: 500;
+
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  backdrop-filter: blur(6px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+
+  transition: all 0.2s ease;
 }
 
-/* אפקט hover */
 .statCard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.08);
 }
 
+/* המספר */
 .value {
-  font-size: 1.5rem;
   font-weight: 700;
-  margin-bottom: 4px;
-  color: #ffffff; /* צבע ברירת מחדל */
+  font-size: 16px;
 }
 
+/* הטקסט */
 .label {
-  font-size: 0.75rem;
-  color: #a0a0b0;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-size: 13px;
+  opacity: 0.85;
 }
 
-/* עיצובים משתנים לפי סוג הנתון */
-.positive .value {
-  color: var(--positive);
-}
+/* צבעים לפי סוג */
 
-.negative .value {
-  color: var(--negative);
-}
-
-.neutral .value {
-  color: #25f4ee;
-}
-
-/* גבולות צבעוניים לפי סוג */
 .positive {
-  border-color: rgba(74, 222, 128, 0.3);
+  color: #4ade80;
+  border-color: rgba(74, 222, 128, 0.4);
+  background: rgba(74, 222, 128, 0.08);
 }
 
 .negative {
-  border-color: rgba(248, 113, 113, 0.3);
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.4);
+  background: rgba(248, 113, 113, 0.08);
 }
 
 .neutral {
-  border-color: rgba(37, 244, 238, 0.3);
+  color: #facc15;
+  border-color: rgba(250, 204, 21, 0.4);
+  background: rgba(250, 204, 21, 0.08);
 }

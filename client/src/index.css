@@ -1,8 +1,16 @@
-body {
+/* ================= RESET ================= */
+
+* {
+  box-sizing: border-box;
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #0a0a0f;
-  color: white;
+  padding: 0;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background: radial-gradient(circle at top, #0f0f1a 0%, #05050a 70%);
+  color: #ffffff;
+  min-height: 100vh;
 }
 
 /* ================= NAVBAR ================= */
@@ -12,12 +20,12 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 16px 32px;
-  background: #14141f;
-  border-bottom: 1px solid #2a2a3d;
+  background: linear-gradient(180deg, #0f0f1a, #0a0a12);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
 .logo {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: bold;
   color: #fe2c55;
 }
@@ -29,68 +37,161 @@ body {
 
 .nav-links span {
   cursor: pointer;
-  color: #ccc;
+  color: #bbb;
   font-size: 14px;
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .nav-links span:hover {
-  color: white;
+  color: #ffffff;
 }
 
-/* ================= Layout כללי ================= */
+/* ================= LAYOUT כללי ================= */
 
 .live-feed-container {
-  padding: 30px;
+  padding: 32px 40px;
 }
+
+/* ================= HEADER ================= */
 
 .live-feed-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 28px;
+}
+
+.live-feed-header h1 {
+  font-size: 32px;
+  font-weight: 700;
 }
 
 .add-btn {
-  background: #fe2c55;
+  background: linear-gradient(135deg, #fe2c55, #ff5a7a);
   color: white;
   border: none;
-  padding: 10px 16px;
-  border-radius: 8px;
+  padding: 12px 20px;
+  border-radius: 12px;
   cursor: pointer;
   font-weight: bold;
+  font-size: 14px;
+  box-shadow: 0 8px 20px rgba(254,44,85,0.35);
+  transition: all 0.25s ease;
 }
 
 .add-btn:hover {
-  opacity: 0.85;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(254,44,85,0.45);
 }
 
 /* ================= מבנה ראשי ================= */
 
 .live-feed-layout {
   display: flex;
-  justify-content: center;
   gap: 40px;
-  margin-top: 30px;
   align-items: flex-start;
 }
 
-/* ================= צד שמאל – Score ================= */
+/* ================= צד שמאל – Stats ================= */
 
 .score-section {
-  width: 220px;
-  background: #14141f;
-  padding: 20px;
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ================= כרטיסים קטנים (StatCard) ================= */
+
+.statCard {
+  background: linear-gradient(160deg, #151525, #0d0d17);
+  padding: 16px 18px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  text-align: center;
+  border: 1px solid rgba(255,255,255,0.05);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.45);
+}
+
+.statCard .value {
+  font-size: 26px;
+  font-weight: bold;
+}
+
+.statCard .label {
+  font-size: 13px;
+  color: #aaa;
+}
+
+.statCard.positive {
+  border: 1px solid rgba(16,185,129,0.4);
+}
+
+.statCard.negative {
+  border: 1px solid rgba(239,68,68,0.4);
+}
+
+.statCard.neutral {
+  border: 1px solid rgba(245,158,11,0.4);
+}
+
+/* ================= Trend Chart ================= */
+
+.trend-card {
+  background: linear-gradient(160deg, #151525, #0d0d17);
+  padding: 18px;
   border-radius: 18px;
-  height: fit-content;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.05);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+}
+
+.trend-card h3 {
+  font-size: 14px;
+  margin-bottom: 12px;
+  color: #ddd;
+}
+
+.trend-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 120px;
+}
+
+.trend-bar {
+  width: 10px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.trend-bar.positive {
+  background: #10b981;
+}
+
+.trend-bar.negative {
+  background: #ef4444;
+}
+
+.trend-bar.neutral {
+  background: #f59e0b;
+}
+
+.trend-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #aaa;
 }
 
 /* ================= מרכז – Feed ================= */
 
 .feed-center {
-  width: 100%;
-  max-width: 780px;
+  flex: 1;
+  max-width: 820px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -101,7 +202,6 @@ body {
 .sentiment-bar {
   display: flex;
   gap: 20px;
-  justify-content: flex-start;
   font-size: 14px;
   font-weight: 600;
 }
@@ -121,26 +221,23 @@ body {
 /* ================= אזור התגובות ================= */
 
 .comments-section {
-  background: linear-gradient(180deg, rgba(20,20,31,0.95), rgba(10,10,15,0.98));
+  background: linear-gradient(180deg, rgba(20,20,35,0.96), rgba(8,8,15,0.98));
   padding: 28px;
-  border-radius: 24px;
+  border-radius: 26px;
   display: flex;
   flex-direction: column;
   gap: 22px;
   min-height: 520px;
-  border: 1px solid rgba(255,255,255,0.05);
-  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.04);
+  box-shadow: 0 25px 60px rgba(0,0,0,0.65);
 }
 
-/* ================= מודאל ================= */
+/* ================= MODAL ================= */
 
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.6);
+  inset: 0;
+  background: rgba(0,0,0,0.65);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -148,23 +245,22 @@ body {
 }
 
 .modal {
-  background: #1a1a2e;
-  padding: 25px;
-  border-radius: 16px;
-  width: 350px;
+  background: linear-gradient(160deg, #1a1a2e, #0f0f1a);
+  padding: 28px;
+  border-radius: 18px;
+  width: 360px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
 }
 
 /* ================= Add Comment Box ================= */
 
 .add-comment-box {
   background: #1a1a2e;
-  padding: 24px 28px;
+  padding: 24px 26px;
   border-radius: 16px;
   width: 100%;
-  max-width: 420px;
   direction: rtl;
   text-align: right;
-  box-sizing: border-box;
 }
 
 .add-comment-box h2 {
@@ -179,22 +275,20 @@ body {
 }
 
 .add-comment-box label {
-  font-size: 14px;
-  margin-bottom: 4px;
-  display: block;
+  font-size: 13px;
+  color: #ccc;
 }
 
 .add-comment-box input,
 .add-comment-box textarea {
   width: 100%;
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: none;
   outline: none;
   font-size: 14px;
-  font-family: inherit;
-  box-sizing: border-box;
-  text-align: right;
+  background: #0f0f1a;
+  color: #fff;
 }
 
 .add-comment-box textarea {
@@ -204,7 +298,7 @@ body {
 
 .add-comment-box button {
   align-self: flex-start;
-  background: #fe2c55;
+  background: linear-gradient(135deg, #fe2c55, #ff5a7a);
   color: white;
   border: none;
   padding: 10px 18px;
@@ -212,37 +306,92 @@ body {
   cursor: pointer;
   font-weight: bold;
   margin-top: 8px;
-}
-
-.add-comment-box button:hover {
-  opacity: 0.85;
-}
-.history-tabs {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-
-.tab {
-  padding: 10px 18px;
-  border-radius: 20px;
-  background: transparent;
-  border: 1px solid #2a2a2a;
-  color: #bbb;
-  font-size: 14px;
-  cursor: pointer;
   transition: all 0.25s ease;
 }
 
-.tab:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
-  border-color: #444;
+.add-comment-box button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(254,44,85,0.4);
+}
+/* ================= Stats Row ================= */
+
+.stats-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 14px;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
-.tab.active {
-  background: linear-gradient(135deg, #ff4d6d, #ff7a7a);
-  color: #fff;
-  border: none;
-  box-shadow: 0 0 10px rgba(255, 77, 109, 0.4);
+
+/* הקטנה כללית של הריבועים */
+.statCard {
+  min-width: 110px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+  backdrop-filter: blur(6px);
+}
+
+/* מספר */
+.statCard .value {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+/* טקסט */
+.statCard .label {
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+/* צבעים */
+.statCard.positive {
+  background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.05));
+  border: 1px solid rgba(16,185,129,0.4);
+  color: #6ee7b7;
+}
+
+.statCard.negative {
+  background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(239,68,68,0.05));
+  border: 1px solid rgba(239,68,68,0.4);
+  color: #fca5a5;
+}
+
+.statCard.neutral {
+  background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(245,158,11,0.05));
+  border: 1px solid rgba(245,158,11,0.4);
+  color: #fde68a;
+}
+.comments-summary-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.summary-item.positive {
+  color: #4ade80;
+}
+
+.summary-item.negative {
+  color: #f87171;
+}
+
+.summary-item.neutral {
+  color: #facc15;
+}
+
+.summary-item .icon {
+  font-size: 16px;
 }

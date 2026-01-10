@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import CommentCard from './CommentCard/CommentCard';
-import ScoreBox from './ScoreBox';
+import TrendChart from './TrendChart';
 import AddComment from './AddComment';
+import UserSummaryCard from './UserSummaryCard';
+import ScoreCircle from './ScoreCircle'; // 🔹 חדש – במקום ScoreBox
 import PropTypes from 'prop-types';
 
 function LiveFeed({ comments, setComments }) {
@@ -32,18 +34,41 @@ function LiveFeed({ comments, setComments }) {
       </div>
 
       <div className="live-feed-layout">
-        {/* Score בצד שמאל */}
+
+        {/* צד שמאל – כרטיס משתמש, ציון עגול, גרף */}
         <div className="score-section">
-          <ScoreBox score={score} />
+
+          <UserSummaryCard
+            username="sarah_dance"
+            avatar="https://i.pravatar.cc/150?img=47"
+            todayCount={25}
+            positivePercent={48}
+            negativePercent={20}
+          />
+
+          {/* 🔹 כאן מחובר הקומפוננטה החדשה */}
+          <ScoreCircle score={score} />
+
+          <TrendChart />
         </div>
 
         {/* אזור הפיד המרכזי */}
         <div className="feed-center">
-          {/* סרגל סנטימנטים */}
-          <div className="sentiment-bar">
-            <span className="positive">✔ חיוביות {positiveCount}</span>
-            <span className="negative">✖ שליליות {negativeCount}</span>
-            <span className="neutral">● ניטרליות {neutralCount}</span>
+
+          {/* שורת סיכום מעל התגובות */}
+          <div className="comments-summary-row">
+            <div className="summary-item positive">
+              <span className="icon">✔</span>
+              <span>חיוביות {positiveCount}</span>
+            </div>
+            <div className="summary-item negative">
+              <span className="icon">✖</span>
+              <span>שליליות {negativeCount}</span>
+            </div>
+            <div className="summary-item neutral">
+              <span className="icon">●</span>
+              <span>ניטרליות {neutralCount}</span>
+            </div>
           </div>
 
           {/* רשימת תגובות */}

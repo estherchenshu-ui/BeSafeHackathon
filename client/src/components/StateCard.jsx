@@ -3,9 +3,9 @@ import styles from './StatCard.module.css';
 
 const StatCard = ({ value, label, colorType = 'neutral' }) => {
   return (
-    <div className={`${styles.statCard} ${styles[colorType]}`}>
-      <div className={styles.value}>{value}</div>
-      <div className={styles.label}>{label}</div>
+    <div className={`${styles.pill} ${styles[colorType]}`}>
+      <span className={styles.value}>{value}</span>
+      <span className={styles.label}>{label}</span>
     </div>
   );
 };
