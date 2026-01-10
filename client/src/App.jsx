@@ -1,20 +1,51 @@
 import { useState } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
 import Navbar from './components/Navbar.jsx';
 import LiveFeed from './components/LiveFeed.jsx';
+import History from './components/History.jsx';
 
 function App() {
   const [comments, setComments] = useState([
-  { from: 'נועה', to: 'דנה', text: 'זה נראה לי חשוד', createdAt: new Date().toISOString() },
-  { from: 'דנה', to: 'מאיה', text: 'לא בטוחה שזה אמין', createdAt: new Date().toISOString() },
-  { from: 'מאיה', to: 'נועה', text: 'ראיתי את זה גם בטיקטוק', createdAt: new Date().toISOString() },
-]);
-
+    {
+      username: 'dana_cohen',
+      text: 'זה נראה לי חשוד',
+      createdAt: new Date().toISOString(),
+      sentiment: 'negative',
+      impact: -10,
+    },
+    {
+      username: 'shira_levi',
+      text: 'לא בטוחה שזה אמין',
+      createdAt: new Date().toISOString(),
+      sentiment: 'neutral',
+      impact: 0,
+    },
+    {
+      username: 'maya_katz',
+      text: 'ראיתי את זה גם בטיקטוק',
+      createdAt: new Date().toISOString(),
+      sentiment: 'positive',
+      impact: 5,
+    },
+  ]);
 
   return (
-    <div>
+    <BrowserRouter>
       <Navbar />
-      <LiveFeed comments={comments} setComments={setComments} />
-    </div>
+
+      <Routes>
+        <Route
+          path="/"
+          element={<LiveFeed comments={comments} setComments={setComments} />}
+        />
+
+        <Route
+          path="/history"
+          element={<History comments={comments} />}
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

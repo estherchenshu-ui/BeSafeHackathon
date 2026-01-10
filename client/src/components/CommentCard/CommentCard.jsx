@@ -1,33 +1,35 @@
 import styles from './CommentCard.module.css';
 import PropTypes from 'prop-types';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 const CommentCard = ({ comment }) => {
   const sentimentClass = styles[comment.sentiment] || '';
-  const [timeAgo, setTimeAgo] = useState('');
+  const [timeAgo, setTimeAgo] = useState('עכשיו');
+
+  const calculateTimeAgo = useCallback(() => {
+    if (!comment.createdAt) return 'עכשיו';
+
+    const now = new Date();
+    const created = new Date(comment.createdAt);
+    const diffInSeconds = Math.floor((now - created) / 1000);
+
+    if (diffInSeconds < 60) return 'עכשיו';
+    if (diffInSeconds < 3600) return `לפני ${Math.floor(diffInSeconds / 60)} דקות`;
+    if (diffInSeconds < 86400) return `לפני ${Math.floor(diffInSeconds / 3600)} שעות`;
+    return `לפני ${Math.floor(diffInSeconds / 86400)} ימים`;
+  }, [comment.createdAt]);
 
   useEffect(() => {
-    const calculateTimeAgo = () => {
-      if (!comment.createdAt) return 'עכשיו';
-
-      const now = new Date();
-      const created = new Date(comment.createdAt);
-      const diffInSeconds = Math.floor((now - created) / 1000);
-
-      if (diffInSeconds < 60) return 'עכשיו';
-      if (diffInSeconds < 3600) return `לפני ${Math.floor(diffInSeconds / 60)} דקות`;
-      if (diffInSeconds < 86400) return `לפני ${Math.floor(diffInSeconds / 3600)} שעות`;
-      return `לפני ${Math.floor(diffInSeconds / 86400)} ימים`;
+    const updateTime = () => {
+      setTimeAgo(calculateTimeAgo());
     };
 
-    setTimeAgo(calculateTimeAgo());
+    updateTime(); // קריאה ראשונית
 
-    const interval = setInterval(() => {
-      setTimeAgo(calculateTimeAgo());
-    }, 1000); // כל שנייה – כדי שתראי שזה חי
+    const interval = setInterval(updateTime, 1000); // כל שנייה – חי בלייב
 
     return () => clearInterval(interval);
-  }, [comment.createdAt]);
+  }, [calculateTimeAgo]);
 
   return (
     <div className={`${styles.commentCard} ${sentimentClass}`}>

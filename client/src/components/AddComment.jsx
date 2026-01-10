@@ -2,24 +2,23 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 
 function AddComment({ setComments }) {
-  const [to, setTo] = useState('');
+  const [username, setUsername] = useState('');
   const [text, setText] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const newComment = {
-      from: 'מיכל',
-      to,
+      username: username.trim(),
       text,
       createdAt: new Date().toISOString(),
       sentiment: 'neutral',
       impact: 0,
     };
 
-    setComments(prev => [...prev, newComment]);
+    setComments((prev) => [newComment, ...prev]); // חדש למעלה
 
-    setTo('');
+    setUsername('');
     setText('');
   };
 
@@ -29,11 +28,11 @@ function AddComment({ setComments }) {
 
       <form onSubmit={handleSubmit}>
         <div>
-          <label>אל:</label>
+          <label>שם משתמש:</label>
           <input
-            value={to}
-            onChange={e => setTo(e.target.value)}
-            placeholder="UserName"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="לדוגמה: dana_cohen"
             required
           />
         </div>
@@ -42,8 +41,8 @@ function AddComment({ setComments }) {
           <label>תוכן התגובה:</label>
           <textarea
             value={text}
-            onChange={e => setText(e.target.value)}
-            placeholder="Comment here"
+            onChange={(e) => setText(e.target.value)}
+            placeholder="כתבי תגובה כאן..."
             required
           />
         </div>

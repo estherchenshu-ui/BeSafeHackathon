@@ -9,19 +9,20 @@ function LiveFeed({ comments, setComments }) {
 
   const safeComments = comments || [];
 
-  const suspiciousCount = safeComments.filter(c =>
-    c.text.includes('חשוד') || c.text.includes('לא בטוחה')
+  const suspiciousCount = safeComments.filter(
+    (c) => c.text.includes('חשוד') || c.text.includes('לא בטוחה')
   ).length;
 
   const score = 100 - suspiciousCount * 20;
 
-  const positiveCount = safeComments.filter(c => c.sentiment === 'positive').length;
-  const negativeCount = safeComments.filter(c => c.sentiment === 'negative').length;
-  const neutralCount  = safeComments.filter(c => !c.sentiment || c.sentiment === 'neutral').length;
+  const positiveCount = safeComments.filter((c) => c.sentiment === 'positive').length;
+  const negativeCount = safeComments.filter((c) => c.sentiment === 'negative').length;
+  const neutralCount = safeComments.filter(
+    (c) => !c.sentiment || c.sentiment === 'neutral'
+  ).length;
 
   return (
     <div className="live-feed-container">
-
       {/* Header */}
       <div className="live-feed-header">
         <h1>Live Feed</h1>
@@ -31,7 +32,6 @@ function LiveFeed({ comments, setComments }) {
       </div>
 
       <div className="live-feed-layout">
-
         {/* Score בצד שמאל */}
         <div className="score-section">
           <ScoreBox score={score} />
@@ -39,7 +39,6 @@ function LiveFeed({ comments, setComments }) {
 
         {/* אזור הפיד המרכזי */}
         <div className="feed-center">
-
           {/* סרגל סנטימנטים */}
           <div className="sentiment-bar">
             <span className="positive">✔ חיוביות {positiveCount}</span>
@@ -50,19 +49,9 @@ function LiveFeed({ comments, setComments }) {
           {/* רשימת תגובות */}
           <div className="comments-section">
             {safeComments.map((comment, index) => (
-              <CommentCard
-                key={index}
-                comment={{
-                  username: comment.from,
-                  text: comment.text,
-                  sentiment: comment.sentiment || 'neutral',
-                  createdAt: comment.createdAt,
-                  impact: comment.impact || 0,
-                }}
-              />
+              <CommentCard key={index} comment={comment} />
             ))}
           </div>
-
         </div>
       </div>
 
@@ -71,7 +60,9 @@ function LiveFeed({ comments, setComments }) {
         <div className="modal-overlay">
           <div className="modal">
             <AddComment setComments={setComments} />
-            <button className="close-btn" onClick={() => setShowModal(false)}>סגור</button>
+            <button className="close-btn" onClick={() => setShowModal(false)}>
+              סגור
+            </button>
           </div>
         </div>
       )}
@@ -82,9 +73,11 @@ function LiveFeed({ comments, setComments }) {
 LiveFeed.propTypes = {
   comments: PropTypes.arrayOf(
     PropTypes.shape({
-      from: PropTypes.string.isRequired,
-      to: PropTypes.string.isRequired,
+      username: PropTypes.string.isRequired,
       text: PropTypes.string.isRequired,
+      sentiment: PropTypes.oneOf(['positive', 'negative', 'neutral']),
+      createdAt: PropTypes.string.isRequired,
+      impact: PropTypes.number,
     })
   ).isRequired,
   setComments: PropTypes.func.isRequired,
