@@ -64,7 +64,7 @@ const CommentCard = ({ comment }) => {
             {/* כאן התיקון: משתמשים ב-scoreValue שחישבנו למעלה */}
             {scoreValue > 0 ? (
               <span className={styles.posImpact}>
-                הציון עלה ב-{scoreValue} נקודות 📈
+                הציון עלה ב-{Math.round(scoreValue)} נקודות 📈
               </span>
             ) : scoreValue < 0 ? (
               <span className={styles.negImpact}>

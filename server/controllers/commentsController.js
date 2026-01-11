@@ -16,7 +16,7 @@ export const addComment = async (req, res) => {
       username: username || 'אנונימי',
       text: text,
       sentiment: analysisResult.sentiment,
-      score: analysisResult.score // הציון הזה כבר כולל את ה-x1.5 אם היה שלילי
+      score:Math.round(analysisResult.score) // הציון הזה כבר כולל את ה-x1.5 אם היה שלילי
     });
 
     // שמירה בפועל
@@ -37,42 +37,48 @@ export const addComment = async (req, res) => {
 // 2. קבלת סטטיסטיקה (GET)
 export const getStats = async (req, res) => {
   try {
-    // 1. חישוב הציון הנוכחי
     const allComments = await Comment.find().sort({ createdAt: 1 });
+    
+    // 1. חישוב הציון הנוכחי הכללי
     const totalImpactSum = allComments.reduce((sum, c) => sum + c.score, 0);
-    const currentHealthScore = calculateHealthScore(totalImpactSum);
+    const currentHealthScore = Math.round(calculateHealthScore(totalImpactSum));
 
-    // 2. בניית הנתונים לגרף (TrendData)
-    // אנחנו נחשב איך ה-Health Score השתנה אחרי כל תגובה ב-10 התגובות האחרונות
-    let runningImpact = totalImpactSum;
+    // 2. לוגיקת "חלונות זמן" - 10 הדקות האחרונות
     const healthHistory = [];
-    
-    // הולכים מהסוף להתחלה כדי לראות את המגמה
-    const lastTen = [...allComments].reverse().slice(0, 10);
-    
-    lastTen.forEach(c => {
-        healthHistory.push(calculateHealthScore(runningImpact));
-        runningImpact -= c.score; // מחסירים את ההשפעה כדי לדעת מה היה הציון קודם
-    });
+    const now = new Date();
 
-    // 3. ספירת כמויות לאחוזים (נשאר כפי שהיה כדי לא להרוס)
-    const total = allComments.length;
+    for (let i = 9; i >= 0; i--) {
+      // יצירת נקודת זמן עבור כל דקה (מ-10 דקות אחורה ועד עכשיו)
+      const pointInTime = new Date(now.getTime() - i * 60000);
+      
+      // חישוב סך הניקוד המצטבר שהיה קיים עד לאותה דקה ספציפית
+      const impactAtPoint = allComments
+        .filter(c => new Date(c.createdAt) <= pointInTime)
+        .reduce((sum, c) => sum + c.score, 0);
+      
+      // המרת הניקוד לציון בריאות ועיגול
+      healthHistory.push(Math.round(calculateHealthScore(impactAtPoint)));
+    }
+
+    // 3. סינון הודעות להיום בלבד עבור ה-Live Feed
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const todayComments = allComments
+      .filter(c => new Date(c.createdAt) >= startOfDay)
+      .reverse();
+
     const positive = allComments.filter(c => c.sentiment === 'positive').length;
     const negative = allComments.filter(c => c.sentiment === 'negative').length;
 
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
-    const commentsToday = allComments.filter(c => c.createdAt >= startOfDay).length;
-
     res.json({
-      today: commentsToday,
-      total,
+      today: todayComments.length,
+      liveComments: todayComments, 
       healthScore: currentHealthScore,
-      trendData: healthHistory.reverse(), // הופכים חזרה שיוצג משמאל לימין
-      breakdown: { positive, negative, neutral: total - positive - negative },
+      trendData: healthHistory, // המערך כבר מסודר כרונולוגית מהישן לחדש
+      breakdown: { positive, negative, neutral: allComments.length - positive - negative },
       percentages: {
-          positive: total > 0 ? Math.round((positive / total) * 100) : 0,
-          negative: total > 0 ? Math.round((negative / total) * 100) : 0
+        positive: allComments.length > 0 ? Math.round((positive / allComments.length) * 100) : 0,
+        negative: allComments.length > 0 ? Math.round((negative / allComments.length) * 100) : 0
       },
       status: getStatus(currentHealthScore)
     });
