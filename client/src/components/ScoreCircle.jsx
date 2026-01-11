@@ -8,28 +8,21 @@ const ScoreCircle = ({ score }) => {
     const offset = circumference - (score / 100) * circumference;
 
     // הפעלת האנימציה בכל פעם שהציון משתנה
-    // useEffect(() => {
-    // setAnimate(true);
-    // const timer = setTimeout(() => setAnimate(false), 300); // האנימציה תימשך 300 מילישניות
-    // return () => clearTimeout(timer);
-    // }, [score]); // הפונקציה תרוץ רק כשה-score משתנה
-useEffect(() => {
-    // שלב 1: מפעילים את האנימציה עם השהייה אפסית כדי לעקוף את ה-Linter
-    const startTimer = setTimeout(() => {
-      setAnimate(true);
-    }, 0);
+    useEffect(() => {
+  const triggerAnimation = () => {
+    setAnimate(true);
 
-    // שלב 2: מכבים את האנימציה אחרי 300 מילישניות
-    const endTimer = setTimeout(() => {
+    const timer = setTimeout(() => {
       setAnimate(false);
     }, 300);
 
-    // ניקוי זיכרון במקרה שהקומפוננטה יורדת מהמסך באמצע
-    return () => {
-      clearTimeout(startTimer);
-      clearTimeout(endTimer);
-    };
-  }, [score]);
+    return () => clearTimeout(timer);
+  };
+
+  const cleanup = triggerAnimation();
+  return cleanup;
+}, [score]);
+
   // קביעת סטטוס לפי הציון
   const getStatusText = (s) => {
     if (s >= 80) return { text: 'מצב מצוין', class: styles.good };
