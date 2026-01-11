@@ -1,12 +1,13 @@
-import axios from 'axios';
-const apiUrl = import.meta.env.VITE_SERVER_API_URL;
+// import axios from 'axios';
 
-// Create an instance of Axios with default configurations
-const axiosInstance = axios.create({
-  baseURL: apiUrl,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+// // שימוש במשתנה סביבה עם ברירת מחדל למניעת שגיאות במצגת
+// const apiUrl = import.meta.env.VITE_SERVER_API_URL || 'http://localhost:5000/api';
 
-export default axiosInstance;
+// const axiosInstance = axios.create({
+//   baseURL: apiUrl,
+//   headers: {
+//     'Content-Type': 'application/json',
+//   },
+// });
+
+// export default axiosInstance;

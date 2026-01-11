@@ -14,9 +14,7 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors({
-  origin: process.env.CLIENT_URL
-}));
+app.use(cors()); // מאפשר לכל כתובת לגשת לשרת
 app.use(express.json());
 
 app.get('/health', (req, res) => {

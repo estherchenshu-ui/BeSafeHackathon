@@ -4,23 +4,23 @@ import { analyzeComment } from '../utils/analyze.js';
 import { calculateHealthScore, getStatus } from '../utils/score.js';
 
 // 1. הוספת תגובה (POST)
+// server/controllers/commentsController.js
 export const addComment = async (req, res) => {
   try {
-    const { username, text } = req.body;
+    const { username, text, createdAt } = req.body; // הוסיפי את createdAt כאן
     
-    // ניתוח הטקסט (כולל החלת הקנס אם צריך)
     const analysisResult = await analyzeComment(text); 
 
-    // יצירת הרשומה לשמירה
     const newComment = new Comment({
       username: username || 'אנונימי',
       text: text,
       sentiment: analysisResult.sentiment,
-      score:Math.round(analysisResult.score) // הציון הזה כבר כולל את ה-x1.5 אם היה שלילי
+      score: Math.round(analysisResult.score),
+      createdAt: createdAt || new Date() // אם שלחת תאריך ב-Postman, הוא ישתמש בו
     });
 
-    // שמירה בפועל
     await newComment.save();
+
     
     // החזרה לפוסטמן (כולל שדות דיבוג שלא נשמרו ב-DB)
     res.status(201).json({
@@ -35,6 +35,7 @@ export const addComment = async (req, res) => {
 };
 
 // 2. קבלת סטטיסטיקה (GET)
+// 2. קבלת סטטיסטיקה (GET)
 export const getStats = async (req, res) => {
   try {
     const allComments = await Comment.find().sort({ createdAt: 1 });
@@ -43,24 +44,29 @@ export const getStats = async (req, res) => {
     const totalImpactSum = allComments.reduce((sum, c) => sum + c.score, 0);
     const currentHealthScore = Math.round(calculateHealthScore(totalImpactSum));
 
-    // 2. לוגיקת "חלונות זמן" - 10 הדקות האחרונות
+    // 2. לוגיקת "חלונות זמן" - 10 הימים האחרונים
     const healthHistory = [];
     const now = new Date();
 
     for (let i = 9; i >= 0; i--) {
-      // יצירת נקודת זמן עבור כל דקה (מ-10 דקות אחורה ועד עכשיו)
-      const pointInTime = new Date(now.getTime() - i * 60000);
+      // יצירת תאריך עבור כל יום ב-10 הימים האחרונים
+      const targetDate = new Date();
+      targetDate.setDate(now.getDate() - i);
       
-      // חישוב סך הניקוד המצטבר שהיה קיים עד לאותה דקה ספציפית
+      // הגדרת נקודת הזמן לסוף אותו יום (23:59:59)
+      // עבור היום הנוכחי (i=0), זה יחשב את הניקוד עד לרגע זה ממש
+      const endOfTargetDay = i === 0 ? now : new Date(targetDate.setHours(23, 59, 59, 999));
+      
+      // חישוב סך הניקוד המצטבר שהיה קיים עד סוף אותו יום ספציפי
       const impactAtPoint = allComments
-        .filter(c => new Date(c.createdAt) <= pointInTime)
+        .filter(c => new Date(c.createdAt) <= endOfTargetDay)
         .reduce((sum, c) => sum + c.score, 0);
       
       // המרת הניקוד לציון בריאות ועיגול
       healthHistory.push(Math.round(calculateHealthScore(impactAtPoint)));
     }
 
-    // 3. סינון הודעות להיום בלבד עבור ה-Live Feed
+    // 3. סינון הודעות להיום בלבד (נשאר ללא שינוי)
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
     const todayComments = allComments
@@ -74,7 +80,7 @@ export const getStats = async (req, res) => {
       today: todayComments.length,
       liveComments: todayComments, 
       healthScore: currentHealthScore,
-      trendData: healthHistory, // המערך כבר מסודר כרונולוגית מהישן לחדש
+      trendData: healthHistory, // עכשיו מייצג 10 ימים
       breakdown: { positive, negative, neutral: allComments.length - positive - negative },
       percentages: {
         positive: allComments.length > 0 ? Math.round((positive / allComments.length) * 100) : 0,
@@ -87,10 +93,10 @@ export const getStats = async (req, res) => {
   }
 };
 
-// 3. היסטוריה (רגיל)
 export const getHistory = async (req, res) => {
   try {
-    const comments = await Comment.find().sort({ timestamp: -1 }).limit(20);
+    // שינוי מ-timestamp ל-createdAt
+    const comments = await Comment.find().sort({ createdAt: -1 }).limit(50); 
     res.json(comments);
   } catch (error) {
     res.status(500).json({ message: error.message });
