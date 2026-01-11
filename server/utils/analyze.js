@@ -27,13 +27,22 @@ export async function analyzeComment(text) {
     let identified = false;
 
     // --- 1. ניתוח מילים מקומי ---
+  // בתוך הפונקציה analyzeComment בקובץ server/utils/analyze.js
+
+    // --- 1. ניתוח מילים מקומי ---
     words.forEach((word, i) => {
-        const cleanWord = word.replace(/[^\p{L}]/gu, ''); 
+        let cleanWord = word.replace(/[^\p{L}]/gu, ''); 
         
+        // 🔥 התיקון הקריטי: כיווץ אותיות חוזרות (3 פעמים ומעלה) לאות אחת 🔥
+        // הופך את "רעההה" ל-"רעה", ואת "ממששש" ל-"ממש"
+        cleanWord = cleanWord.replace(/(.)\1{2,}/g, '$1');
+
+        // בדיקה מול המילון החיובי
         if (positiveWords[cleanWord]) {
             score += hasNegation(words, i) ? -positiveWords[cleanWord] : positiveWords[cleanWord];
             identified = true;
         }
+        // בדיקה מול המילון השלילי (עכשיו זה ימצא את "רעה"!)
         else if (negativeWords[cleanWord]) {
             score += hasNegation(words, i) ? 0 : negativeWords[cleanWord];
             identified = true;

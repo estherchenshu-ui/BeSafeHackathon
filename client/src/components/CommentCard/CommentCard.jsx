@@ -6,6 +6,9 @@ const CommentCard = ({ comment }) => {
   const sentimentClass = styles[comment.sentiment] || '';
   const [timeAgo, setTimeAgo] = useState('עכשיו');
 
+  // שימוש ב-score אם קיים, אחרת impact, אחרת 0
+  const scoreValue = comment.score !== undefined ? comment.score : (comment.impact || 0);
+
   const calculateTimeAgo = useCallback(() => {
     if (!comment.createdAt) return 'עכשיו';
 
@@ -24,9 +27,8 @@ const CommentCard = ({ comment }) => {
       setTimeAgo(calculateTimeAgo());
     };
 
-    updateTime(); // קריאה ראשונית
-
-    const interval = setInterval(updateTime, 1000); // כל שנייה – חי בלייב
+    updateTime(); 
+    const interval = setInterval(updateTime, 1000); 
 
     return () => clearInterval(interval);
   }, [calculateTimeAgo]);
@@ -59,13 +61,14 @@ const CommentCard = ({ comment }) => {
         <div className={styles.footer}>
           <span className={styles.heartIcon}></span>
           <div className={styles.impactRow}>
-            {comment.impact > 0 ? (
+            {/* כאן התיקון: משתמשים ב-scoreValue שחישבנו למעלה */}
+            {scoreValue > 0 ? (
               <span className={styles.posImpact}>
-                הציון עלה ב-{comment.impact} נקודות 📈
+                הציון עלה ב-{Math.round(scoreValue)} נקודות 📈
               </span>
-            ) : comment.impact < 0 ? (
+            ) : scoreValue < 0 ? (
               <span className={styles.negImpact}>
-                הציון ירד ב-{Math.abs(comment.impact)} נקודות 📉
+                הציון ירד ב-{Math.abs(scoreValue)} נקודות 📉
               </span>
             ) : (
               <span className={styles.neutImpact}>ללא שינוי בציון ↔️</span>
@@ -79,11 +82,12 @@ const CommentCard = ({ comment }) => {
 
 CommentCard.propTypes = {
   comment: PropTypes.shape({
-    username: PropTypes.string.isRequired,
+    username: PropTypes.string,
     text: PropTypes.string.isRequired,
-    sentiment: PropTypes.oneOf(['positive', 'negative', 'neutral']),
+    sentiment: PropTypes.string,
     createdAt: PropTypes.string,
     impact: PropTypes.number,
+    score: PropTypes.number, // הוספנו גם את זה
   }).isRequired,
 };
 

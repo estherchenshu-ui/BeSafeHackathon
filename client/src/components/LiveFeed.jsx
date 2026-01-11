@@ -1,31 +1,34 @@
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 import CommentCard from './CommentCard/CommentCard';
 import TrendChart from './TrendChart';
 import AddComment from './AddComment';
 import UserSummaryCard from './UserSummaryCard';
-import ScoreCircle from './ScoreCircle'; // 🔹 חדש – במקום ScoreBox
-import PropTypes from 'prop-types';
+import ScoreCircle from './ScoreCircle';
 
-function LiveFeed({ comments, setComments }) {
+function LiveFeed({ stats, refreshData }) {
   const [showModal, setShowModal] = useState(false);
 
-  const safeComments = comments || [];
+  // --- התיקון הקריטי: משתמשים רק בתגובות היום שמגיעות מהבאקנד ---
+  const safeComments = stats?.liveComments || [];
 
-  const suspiciousCount = safeComments.filter(
-    (c) => c.text.includes('חשוד') || c.text.includes('לא בטוחה')
-  ).length;
+  const score = stats ? stats.healthScore : 100;
+  
+  const positiveCount = stats?.breakdown?.positive || 0;
+  const negativeCount = stats?.breakdown?.negative || 0;
+  const neutralCount = stats?.breakdown?.neutral || 0;
+  
+  const todayCount = stats?.today || 0;
+  const posPercent = stats?.percentages?.positive || 0;
+  const negPercent = stats?.percentages?.negative || 0;
 
-  const score = 100 - suspiciousCount * 20;
-
-  const positiveCount = safeComments.filter((c) => c.sentiment === 'positive').length;
-  const negativeCount = safeComments.filter((c) => c.sentiment === 'negative').length;
-  const neutralCount = safeComments.filter(
-    (c) => !c.sentiment || c.sentiment === 'neutral'
-  ).length;
+  const handleCommentAdded = () => {
+    refreshData();
+    setShowModal(false);
+  };
 
   return (
     <div className="live-feed-container">
-      {/* Header */}
       <div className="live-feed-header">
         <h1>Live Feed</h1>
         <button className="add-btn" onClick={() => setShowModal(true)}>
@@ -34,57 +37,58 @@ function LiveFeed({ comments, setComments }) {
       </div>
 
       <div className="live-feed-layout">
-
-        {/* צד שמאל – כרטיס משתמש, ציון עגול, גרף */}
+        {/* צד שמאל - סטטיסטיקות וגרפים */}
         <div className="score-section">
-
           <UserSummaryCard
-            username="sarah_dance"
-            avatar="https://i.pravatar.cc/150?img=47"
-            todayCount={25}
-            positivePercent={48}
-            negativePercent={20}
+            username="Community View" 
+            avatar="https://cdn-icons-png.flaticon.com/512/1256/1256661.png"
+            todayCount={todayCount}
+            positivePercent={posPercent}
+            negativePercent={negPercent}
           />
 
-          {/* 🔹 כאן מחובר הקומפוננטה החדשה */}
           <ScoreCircle score={score} />
 
-          <TrendChart />
+          {/* הגרף מקבל נתוני מגמה בזמן אמת */}
+          <TrendChart data={stats?.trendData || []} />
         </div>
 
-        {/* אזור הפיד המרכזי */}
+        {/* צד ימין - רשימת תגובות חיה */}
         <div className="feed-center">
-
-          {/* שורת סיכום מעל התגובות */}
           <div className="comments-summary-row">
             <div className="summary-item positive">
-              <span className="icon">✔</span>
-              <span>חיוביות {positiveCount}</span>
+              <span className="icon">✔</span> <span>חיוביות {positiveCount}</span>
             </div>
             <div className="summary-item negative">
-              <span className="icon">✖</span>
-              <span>שליליות {negativeCount}</span>
+              <span className="icon">✖</span> <span>שליליות {negativeCount}</span>
             </div>
             <div className="summary-item neutral">
-              <span className="icon">●</span>
-              <span>ניטרליות {neutralCount}</span>
+              <span className="icon">●</span> <span>ניטרליות {neutralCount}</span>
             </div>
           </div>
 
-          {/* רשימת תגובות */}
           <div className="comments-section">
-            {safeComments.map((comment, index) => (
-              <CommentCard key={index} comment={comment} />
-            ))}
+            {safeComments.length === 0 ? (
+              <p style={{ color: 'white', textAlign: 'center', marginTop: '20px' }}>
+                אין תגובות חדשות להיום.
+              </p>
+            ) : (
+              safeComments.map((comment, index) => (
+                <CommentCard 
+                  key={comment._id || index}
+                  comment={comment} 
+                />
+              ))
+            )}
           </div>
         </div>
       </div>
 
-      {/* מודאל */}
+      {/* מודאל הוספת תגובה */}
       {showModal && (
         <div className="modal-overlay">
           <div className="modal">
-            <AddComment setComments={setComments} />
+            <AddComment onCommentAdded={handleCommentAdded} />
             <button className="close-btn" onClick={() => setShowModal(false)}>
               סגור
             </button>
@@ -96,16 +100,16 @@ function LiveFeed({ comments, setComments }) {
 }
 
 LiveFeed.propTypes = {
-  comments: PropTypes.arrayOf(
-    PropTypes.shape({
-      username: PropTypes.string.isRequired,
-      text: PropTypes.string.isRequired,
-      sentiment: PropTypes.oneOf(['positive', 'negative', 'neutral']),
-      createdAt: PropTypes.string.isRequired,
-      impact: PropTypes.number,
-    })
-  ).isRequired,
-  setComments: PropTypes.func.isRequired,
+  // הסרנו את comments המקורי כי אנחנו משתמשים ב-stats.liveComments
+  refreshData: PropTypes.func.isRequired,
+  stats: PropTypes.shape({
+    healthScore: PropTypes.number,
+    today: PropTypes.number,
+    liveComments: PropTypes.array,
+    trendData: PropTypes.array,
+    breakdown: PropTypes.object,
+    percentages: PropTypes.object
+  })
 };
 
 export default LiveFeed;
