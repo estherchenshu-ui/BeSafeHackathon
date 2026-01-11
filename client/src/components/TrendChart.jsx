@@ -3,41 +3,42 @@ import PropTypes from 'prop-types';
 import './TrendChart.css';
 
 const TrendChart = ({ data }) => {
-  // אם לא העבירו נתונים, נשתמש בנתונים פיקטיביים לתצוגה
-  const chartData = data || [65, 70, 68, 75, 82, 80, 55, 60, 72, 78];
+  const demoData = [70, 75, 68, 55, 82, 78, 74, 80, 85, 77];
+  const chartData = data && data.length === 10 ? data : demoData;
 
-  // פונקציה שקובעת את הצבע לפי הציון (לוגיקה מהאפיון)
   const getStatusClass = (score) => {
-    if (score >= 80) return 'positive'; // ירוק
-    if (score < 60) return 'negative';  // אדום
-    return 'neutral';                   // כתום
+    if (score >= 80) return 'positive';
+    if (score < 60) return 'negative';
+    return 'neutral';
   };
 
   return (
     <div className="trend-card">
-      <h3>📈 מגמת ציון - 10 דקות אחרונות</h3>
+      <h3>📈 מגמת ציון – 10 ימים אחרונים</h3>
 
-      <div className="trend-chart">
+      <div className="trend-grid-wrapper">
+        {/* שורת העמודות */}
         {chartData.map((score, index) => (
           <div
             key={index}
             className={`trend-bar ${getStatusClass(score)}`}
-            style={{ height: `${score}%` }} // הגובה לפי הציון באחוזים
-            data-value={score} // בשביל הטולטיפ ב-CSS
+            style={{ height: `${score}%` }}
+            data-value={score}
           ></div>
         ))}
-      </div>
 
-      <div className="trend-labels">
-        <span>10 דק&apos; קודם</span>
-        <span>עכשיו</span>
+        {/* תווית שמאל */}
+        <span className="trend-edge-label left">עשרה ימים קודם</span>
+
+        {/* תווית ימין */}
+        <span className="trend-edge-label right">היום</span>
       </div>
     </div>
   );
 };
 
 TrendChart.propTypes = {
-  data: PropTypes.array,
+  data: PropTypes.arrayOf(PropTypes.number),
 };
 
 export default TrendChart;
