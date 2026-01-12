@@ -20,7 +20,7 @@ app.use(express.json());
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
-app.use('/api', commentsRoutes);
+app.use('/api/comments', commentsRoutes);
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
