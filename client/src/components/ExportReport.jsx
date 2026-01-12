@@ -13,7 +13,7 @@ import BehaviorChangeCard from './BehaviorChangeCard';
 
 function calculateMonthlyAverages(comments) {
   const now = new Date();
-  const weeks = [[], [], [], []]; // שבוע 1 (ישן) -> שבוע 4 (אחרון)
+  const weeks = [[], [], [], []];
 
   comments.forEach((comment) => {
     if (!comment.createdAt) return;
@@ -35,7 +35,7 @@ function calculateMonthlyAverages(comments) {
 
 function calculateHalfYearAverages(comments) {
   const now = new Date();
-  const months = [[], [], [], [], [], []]; // 6 חודשים אחרונים
+  const months = [[], [], [], [], [], []];
 
   comments.forEach((comment) => {
     if (!comment.createdAt) return;
@@ -82,9 +82,7 @@ function calculateYearAverages(comments) {
 /* ================= קומפוננטה ראשית ================= */
 
 function ExportReport({ comments }) {
-  const [period, setPeriod] = useState('month'); // month | halfYear | year
-
-  /* ================= פילטור לפי תקופה ================= */
+  const [period, setPeriod] = useState('month');
 
   const filteredComments = useMemo(() => {
     const now = new Date();
@@ -102,8 +100,6 @@ function ExportReport({ comments }) {
       return false;
     });
   }, [period, comments]);
-
-  /* ================= חישובים ================= */
 
   const averageScore =
     filteredComments.length === 0
@@ -129,8 +125,6 @@ function ExportReport({ comments }) {
     (c) => c.sentiment === 'negative'
   ).length;
 
-  /* ================= נתונים לגרפים ================= */
-
   const monthlyData = calculateMonthlyAverages(filteredComments);
   const halfYearData = calculateHalfYearAverages(filteredComments);
   const yearData = calculateYearAverages(filteredComments);
@@ -141,7 +135,7 @@ function ExportReport({ comments }) {
 
   return (
     <div className="export-report-container">
-      {/* ================= Header ================= */}
+      {/* Header */}
       <div className="export-report-header">
         <h1>Report</h1>
         <button className="send-report-btn" onClick={sendReportByEmail}>
@@ -149,7 +143,7 @@ function ExportReport({ comments }) {
         </button>
       </div>
 
-      {/* ================= Tabs ================= */}
+      {/* Tabs */}
       <div className="report-period-tabs">
         <button
           className={period === 'month' ? 'report-tab active' : 'report-tab'}
@@ -173,9 +167,8 @@ function ExportReport({ comments }) {
         </button>
       </div>
 
-      {/* ================= TOP GRID ================= */}
+      {/* TOP GRID */}
       <div className="export-report-top-grid">
-        {/* שמאל – שינוי התנהגות */}
         <div className="report-card">
           <BehaviorChangeCard
             positiveChange={positiveCount}
@@ -183,23 +176,20 @@ function ExportReport({ comments }) {
           />
         </div>
 
-        {/* אמצע – גרף מגמה */}
         <div className="report-card">
           <h3>מגמת ציון לאורך התקופה</h3>
-
           {period === 'month' && <MonthlyTrendChart data={monthlyData} />}
           {period === 'halfYear' && <HalfYearTrendChart data={halfYearData} />}
           {period === 'year' && <YearTrendChart data={yearData} />}
         </div>
 
-        {/* ימין – ציון ממוצע */}
         <div className="report-card">
           <h3>ציון בריאות ממוצע לתקופה</h3>
           <ScoreCircle score={averageScore} />
         </div>
       </div>
 
-      {/* ================= BOTTOM GRID ================= */}
+      {/* BOTTOM GRID */}
       <div className="export-report-bottom-grid">
         {mostNegativeComment && (
           <div className="report-card wide">
