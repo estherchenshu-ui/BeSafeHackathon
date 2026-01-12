@@ -3,38 +3,38 @@ import './BehaviorChangeCard.css';
 
 function BehaviorChangeCard({ positiveChange, negativeChange }) {
   const total = positiveChange + negativeChange || 1;
+
   const positivePercent = Math.round((positiveChange / total) * 100);
   const negativePercent = Math.round((negativeChange / total) * 100);
 
   return (
-    <div className="behavior-card">
-      <h3>שינוי בהתנהגות לעומת חודש קודם</h3>
+    <div className="behavior-split-card">
 
-      <div className="behavior-row positive">
-        <div className="label">
-          ⬆️ תגובות חיוביות
+      {/* צד ימין – חיובי */}
+      <div className="behavior-side positive">
+        <div className="behavior-title">תגובות חיוביות</div>
+        <div className="behavior-percent positive">
+          {positivePercent}%
         </div>
-        <div className="bar-container">
-          <div
-            className="bar-fill positive"
-            style={{ width: `${positivePercent}%` }}
-          />
+        <div className="behavior-subtext">
+          שינוי ביחס לחודש הקודם
         </div>
-        <div className="value">{positiveChange}</div>
       </div>
 
-      <div className="behavior-row negative">
-        <div className="label">
-          ⬇️ תגובות שליליות
+      {/* קו הפרדה */}
+      <div className="behavior-divider" />
+
+      {/* צד שמאל – שלילי */}
+      <div className="behavior-side negative">
+        <div className="behavior-title">תגובות שליליות</div>
+        <div className="behavior-percent negative">
+          {negativePercent}%
         </div>
-        <div className="bar-container">
-          <div
-            className="bar-fill negative"
-            style={{ width: `${negativePercent}%` }}
-          />
+        <div className="behavior-subtext">
+          שינוי ביחס לחודש הקודם
         </div>
-        <div className="value">{negativeChange}</div>
       </div>
+
     </div>
   );
 }

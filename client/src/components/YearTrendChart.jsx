@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import './ReportTrends.css';
 
 function YearTrendChart({ data }) {
@@ -19,5 +20,9 @@ function YearTrendChart({ data }) {
     </div>
   );
 }
+
+YearTrendChart.propTypes = {
+  data: PropTypes.arrayOf(PropTypes.number).isRequired
+};
 
 export default YearTrendChart;
