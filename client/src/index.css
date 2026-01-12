@@ -1,6 +1,5 @@
-/* ================= RESET ================= */
 
-* {
+{
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -306,4 +305,41 @@ body {
 .add-comment-box button:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 24px rgba(254,44,85,0.4);
+}
+/* ================= History Filters ================= */
+
+.history-filters {
+  width: 100%;
+  max-width: 1400px;
+  display: flex;
+  gap: 12px;
+  margin: 8px auto 24px auto;
+  flex-wrap: wrap;
+}
+
+.history-filter-btn {
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: linear-gradient(160deg, #151525, #0d0d17);
+  color: #ccc;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+}
+
+.history-filter-btn:hover {
+  color: #fff;
+  border-color: rgba(254,44,85,0.6);
+  box-shadow: 0 8px 22px rgba(254,44,85,0.25);
+  transform: translateY(-1px);
+}
+
+.history-filter-btn.active {
+  background: linear-gradient(135deg, #fe2c55, #ff5a7a);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 10px 26px rgba(254,44,85,0.45);
 }
