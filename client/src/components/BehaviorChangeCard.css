@@ -1,58 +1,70 @@
-.behavior-card {
+.behavior-split-card {
   display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.behavior-card h3 {
-  font-size: 18px;
-  font-weight: 700;
-  color: #fff;
-}
-
-/* שורה אחת */
-.behavior-row {
-  display: grid;
-  grid-template-columns: 120px 1fr 40px;
-  align-items: center;
-  gap: 12px;
-}
-
-.behavior-row .label {
-  font-size: 14px;
-  color: #ddd;
-  white-space: nowrap;
-}
-
-.bar-container {
-  height: 10px;
-  background: rgba(255,255,255,0.08);
-  border-radius: 999px;
+  height: 100%;
+  min-height: 160px;
+  border-radius: 18px;
   overflow: hidden;
 }
 
-.bar-fill {
-  height: 100%;
-  border-radius: 999px;
-  transition: width 0.6s ease;
+/* צד */
+.behavior-side {
+  flex: 1;
+  padding: 22px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+/* חיובי */
+.behavior-side.positive {
+  background: linear-gradient(160deg, rgba(16,185,129,0.18), rgba(16,185,129,0.05));
+}
+
+/* שלילי */
+.behavior-side.negative {
+  background: linear-gradient(160deg, rgba(239,68,68,0.18), rgba(239,68,68,0.05));
+}
+
+/* כותרת */
+.behavior-title {
+  font-size: 14px;
+  color: #e5e7eb;
+  opacity: 0.9;
+}
+
+/* אחוז גדול */
+.behavior-percent {
+  font-size: 42px;
+  font-weight: 900;
+  line-height: 1;
 }
 
 /* צבעים */
-.bar-fill.positive {
-  background: linear-gradient(90deg, #10b981, #34d399);
+.behavior-percent.positive {
+  color: #34d399;
+  text-shadow: 0 0 12px rgba(52,211,153,0.35);
 }
 
-.bar-fill.negative {
-  background: linear-gradient(90deg, #ef4444, #f87171);
+.behavior-percent.negative {
+  color: #f87171;
+  text-shadow: 0 0 12px rgba(248,113,113,0.35);
 }
 
-.behavior-row .value {
-  font-weight: 700;
-  font-size: 14px;
-  text-align: right;
+/* טקסט קטן */
+.behavior-subtext {
+  font-size: 12px;
+  color: #a0a0b0;
 }
 
-/* hover קטן */
-.behavior-row:hover .bar-fill {
-  filter: brightness(1.15);
+/* קו הפרדה */
+.behavior-divider {
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(255,255,255,0.15),
+    transparent
+  );
 }

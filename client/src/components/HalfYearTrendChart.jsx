@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import './ReportTrends.css';
 
 function HalfYearTrendChart({ data }) {
@@ -19,5 +20,9 @@ function HalfYearTrendChart({ data }) {
     </div>
   );
 }
+
+HalfYearTrendChart.propTypes = {
+  data: PropTypes.arrayOf(PropTypes.number).isRequired
+};
 
 export default HalfYearTrendChart;

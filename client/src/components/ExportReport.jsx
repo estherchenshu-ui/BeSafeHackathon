@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 import MonthlyTrendChart from './MonthlyTrendChart';
@@ -83,14 +83,13 @@ function calculateYearAverages(comments) {
 
 function ExportReport({ comments }) {
   const [period, setPeriod] = useState('month'); // month | halfYear | year
-  const [filteredComments, setFilteredComments] = useState([]);
 
   /* ================= פילטור לפי תקופה ================= */
 
-  useEffect(() => {
+  const filteredComments = useMemo(() => {
     const now = new Date();
 
-    const filtered = comments.filter((comment) => {
+    return comments.filter((comment) => {
       if (!comment.createdAt) return false;
 
       const created = new Date(comment.createdAt);
@@ -100,10 +99,8 @@ function ExportReport({ comments }) {
       if (period === 'halfYear') return diffInDays <= 180;
       if (period === 'year') return diffInDays <= 365;
 
-      return true;
+      return false;
     });
-
-    setFilteredComments(filtered);
   }, [period, comments]);
 
   /* ================= חישובים ================= */
@@ -144,7 +141,6 @@ function ExportReport({ comments }) {
 
   return (
     <div className="export-report-container">
-
       {/* ================= Header ================= */}
       <div className="export-report-header">
         <h1>Report</h1>
@@ -179,8 +175,7 @@ function ExportReport({ comments }) {
 
       {/* ================= TOP GRID ================= */}
       <div className="export-report-top-grid">
-
-        {/* שמאל – שינוי התנהגות (קומפוננטה אינטרקטיבית) */}
+        {/* שמאל – שינוי התנהגות */}
         <div className="report-card">
           <BehaviorChangeCard
             positiveChange={positiveCount}
@@ -188,14 +183,13 @@ function ExportReport({ comments }) {
           />
         </div>
 
-        {/* אמצע – גרף מגמה (לפי תקופה) */}
+        {/* אמצע – גרף מגמה */}
         <div className="report-card">
           <h3>מגמת ציון לאורך התקופה</h3>
 
           {period === 'month' && <MonthlyTrendChart data={monthlyData} />}
           {period === 'halfYear' && <HalfYearTrendChart data={halfYearData} />}
           {period === 'year' && <YearTrendChart data={yearData} />}
-
         </div>
 
         {/* ימין – ציון ממוצע */}
@@ -203,12 +197,10 @@ function ExportReport({ comments }) {
           <h3>ציון בריאות ממוצע לתקופה</h3>
           <ScoreCircle score={averageScore} />
         </div>
-
       </div>
 
       {/* ================= BOTTOM GRID ================= */}
       <div className="export-report-bottom-grid">
-
         {mostNegativeComment && (
           <div className="report-card wide">
             <h3>⬇️ התגובה שהורידה הכי הרבה ציון</h3>
@@ -222,7 +214,6 @@ function ExportReport({ comments }) {
             <CommentCard comment={mostPositiveComment} />
           </div>
         )}
-
       </div>
     </div>
   );
