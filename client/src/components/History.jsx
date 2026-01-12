@@ -34,12 +34,14 @@ const History = ({ comments }) => {
       <div className="history-filters">
         <button
           className={`history-filter-btn ${filter === 'all' ? 'active' : ''}`}
+          className={`history-filter-btn ${filter === 'all' ? 'active' : ''}`}
           onClick={() => setFilter('all')}
         >
           הכל
         </button>
 
         <button
+          className={`history-filter-btn ${filter === '1h' ? 'active' : ''}`}
           className={`history-filter-btn ${filter === '1h' ? 'active' : ''}`}
           onClick={() => setFilter('1h')}
         >
@@ -48,12 +50,14 @@ const History = ({ comments }) => {
 
         <button
           className={`history-filter-btn ${filter === '6h' ? 'active' : ''}`}
+          className={`history-filter-btn ${filter === '6h' ? 'active' : ''}`}
           onClick={() => setFilter('6h')}
         >
           6 שעות
         </button>
 
         <button
+          className={`history-filter-btn ${filter === '24h' ? 'active' : ''}`}
           className={`history-filter-btn ${filter === '24h' ? 'active' : ''}`}
           onClick={() => setFilter('24h')}
         >

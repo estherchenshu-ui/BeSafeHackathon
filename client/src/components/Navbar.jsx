@@ -14,8 +14,9 @@ function Navbar() {
         🛡 SafeTok
       </div>
 
-      {/* קישורים – רק Live Feed ו-History */}
+      {/* קישורים */}
       <div className="nav-links">
+
         <span onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
           Live Feed
         </span>
@@ -23,6 +24,11 @@ function Navbar() {
         <span onClick={() => navigate('/history')} style={{ cursor: 'pointer' }}>
           History
         </span>
+
+        <span onClick={() => navigate('/export-report')} style={{ cursor: 'pointer' }}>
+          Report
+        </span>
+
       </div>
     </div>
   );
