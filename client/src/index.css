@@ -307,3 +307,270 @@ body {
   transform: translateY(-2px);
   box-shadow: 0 10px 24px rgba(254,44,85,0.4);
 }
+/* ================= History Filters ================= */
+
+.history-filters {
+  width: 100%;
+  max-width: 1400px;
+  display: flex;
+  gap: 12px;
+  margin: 8px auto 24px auto;
+  flex-wrap: wrap;
+}
+
+.history-filter-btn {
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: linear-gradient(160deg, #151525, #0d0d17);
+  color: #ccc;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+}
+
+.history-filter-btn:hover {
+  color: #fff;
+  border-color: rgba(254,44,85,0.6);
+  box-shadow: 0 8px 22px rgba(254,44,85,0.25);
+  transform: translateY(-1px);
+}
+
+.history-filter-btn.active {
+  background: linear-gradient(135deg, #fe2c55, #ff5a7a);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 10px 26px rgba(254,44,85,0.45);
+}
+/* ================= EXPORT REPORT ================= */
+
+/* עוטף כללי */
+.export-report-container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* כותרת + כפתור מייל */
+.export-report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.export-report-header h1 {
+  font-size: 34px;
+  font-weight: 800;
+}
+
+/* כפתור שליחת מייל */
+.send-report-btn {
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 14px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  box-shadow: 0 8px 24px rgba(99,102,241,0.35);
+  transition: all 0.25s ease;
+}
+
+.send-report-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(99,102,241,0.5);
+}
+
+/* ================= בחירת תקופה ================= */
+
+.report-period-tabs {
+  display: flex;
+  gap: 14px;
+}
+
+.report-tab {
+  padding: 10px 20px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.06);
+  color: #bbb;
+  border: 1px solid rgba(255,255,255,0.08);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.report-tab:hover {
+  background: rgba(255,255,255,0.12);
+  color: white;
+}
+
+.report-tab.active {
+  background: linear-gradient(135deg, #fe2c55, #ff5a7a);
+  color: white;
+  box-shadow: 0 6px 18px rgba(254,44,85,0.45);
+  border: none;
+}
+
+/* ================= פריסה ================= */
+
+.export-report-layout {
+  display: flex;
+  gap: 48px;
+  align-items: flex-start;
+}
+
+/* מרכז */
+.export-report-main {
+  flex: 1;
+  max-width: 820px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* כרטיס כללי */
+.report-card {
+  background: linear-gradient(160deg, #151525, #0d0d17);
+  padding: 26px;
+  border-radius: 26px;
+  border: 1px solid rgba(255,255,255,0.05);
+  box-shadow: 0 18px 50px rgba(0,0,0,0.55);
+}
+
+/* כותרת בתוך כרטיס */
+.report-card h3 {
+  margin-bottom: 16px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ================= תגובות קיצון ================= */
+
+.extreme-comment-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #ddd;
+}
+
+/* ================= השוואה חודשית ================= */
+
+.month-compare-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 15px;
+}
+
+.month-compare-box .up {
+  color: #4ade80;
+}
+
+.month-compare-box .down {
+  color: #f87171;
+}
+
+/* ================= רספונסיביות ================= */
+
+@media (max-width: 1000px) {
+  .export-report-layout {
+    flex-direction: column;
+  }
+
+  .export-report-main {
+    max-width: 100%;
+  }
+}
+/* ===== Export Report Layout ===== */
+
+.export-report-container {
+  padding: 32px 40px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.export-report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.send-report-btn {
+  background: linear-gradient(135deg, #fe2c55, #ff5a7a);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.report-period-tabs {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.report-tab {
+  padding: 10px 18px;
+  border-radius: 20px;
+  background: transparent;
+  border: 1px solid #333;
+  color: #bbb;
+  cursor: pointer;
+}
+
+.report-tab.active {
+  background: linear-gradient(135deg, #ff4d6d, #ff7a7a);
+  color: white;
+  border: none;
+}
+
+/* GRID עליון – 3 עמודות */
+.export-report-top-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+/* GRID תחתון – 2 עמודות */
+.export-report-bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.report-card {
+  background: linear-gradient(160deg, #151525, #0d0d17);
+  border-radius: 22px;
+  padding: 20px;
+  border: 1px solid rgba(255,255,255,0.05);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.55);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.report-card.wide {
+  min-height: 220px;
+}
+
+.month-compare-box .up {
+  color: #4ade80;
+  font-weight: 600;
+}
+
+.month-compare-box .down {
+  color: #f87171;
+  font-weight: 600;
+}
