@@ -1,216 +1,86 @@
-import { useState, useMemo } from 'react';
-import PropTypes from 'prop-types';
-
+import { useState, useEffect } from 'react';
+import axiosInstance from '../utils/axiosInstance';
 import MonthlyTrendChart from './MonthlyTrendChart';
 import HalfYearTrendChart from './HalfYearTrendChart';
 import YearTrendChart from './YearTrendChart';
-
 import ScoreCircle from './ScoreCircle';
 import CommentCard from './CommentCard/CommentCard';
 import BehaviorChangeCard from './BehaviorChangeCard';
 
-/* ================= פונקציות עזר לחישוב נתונים ================= */
-
-function calculateMonthlyAverages(comments) {
-  const now = new Date();
-  const weeks = [[], [], [], []];
-
-  comments.forEach((comment) => {
-    if (!comment.createdAt) return;
-    const created = new Date(comment.createdAt);
-    const diffInDays = (now - created) / (1000 * 60 * 60 * 24);
-
-    if (diffInDays <= 7) weeks[3].push(comment.score || 0);
-    else if (diffInDays <= 14) weeks[2].push(comment.score || 0);
-    else if (diffInDays <= 21) weeks[1].push(comment.score || 0);
-    else if (diffInDays <= 30) weeks[0].push(comment.score || 0);
-  });
-
-  return weeks.map((week) =>
-    week.length === 0
-      ? 0
-      : Math.round(week.reduce((a, b) => a + b, 0) / week.length)
-  );
-}
-
-function calculateHalfYearAverages(comments) {
-  const now = new Date();
-  const months = [[], [], [], [], [], []];
-
-  comments.forEach((comment) => {
-    if (!comment.createdAt) return;
-    const created = new Date(comment.createdAt);
-    const diffInMonths =
-      (now.getFullYear() - created.getFullYear()) * 12 +
-      (now.getMonth() - created.getMonth());
-
-    if (diffInMonths < 6) {
-      months[5 - diffInMonths].push(comment.score || 0);
-    }
-  });
-
-  return months.map((month) =>
-    month.length === 0
-      ? 0
-      : Math.round(month.reduce((a, b) => a + b, 0) / month.length)
-  );
-}
-
-function calculateYearAverages(comments) {
-  const now = new Date();
-  const months = Array.from({ length: 12 }, () => []);
-
-  comments.forEach((comment) => {
-    if (!comment.createdAt) return;
-    const created = new Date(comment.createdAt);
-    const diffInMonths =
-      (now.getFullYear() - created.getFullYear()) * 12 +
-      (now.getMonth() - created.getMonth());
-
-    if (diffInMonths < 12) {
-      months[11 - diffInMonths].push(comment.score || 0);
-    }
-  });
-
-  return months.map((month) =>
-    month.length === 0
-      ? 0
-      : Math.round(month.reduce((a, b) => a + b, 0) / month.length)
-  );
-}
-
-/* ================= קומפוננטה ראשית ================= */
-
-function ExportReport({ comments }) {
+function ExportReport() {
   const [period, setPeriod] = useState('month');
+  const [reportData, setReportData] = useState(null);
 
-  const filteredComments = useMemo(() => {
-    const now = new Date();
+  useEffect(() => {
+    const fetchReport = async () => {
+      try {
+        const res = await axiosInstance.get(`/report?period=${period}`);
+        setReportData(res.data);
+      } catch (err) {
+        console.error("Error fetching report:", err);
+      }
+    };
+    fetchReport();
+  }, [period]);
 
-    return comments.filter((comment) => {
-      if (!comment.createdAt) return false;
+  if (!reportData) return <div style={{color: 'white'}}>טוען דוח...</div>;
 
-      const created = new Date(comment.createdAt);
-      const diffInDays = Math.abs(now - created) / (1000 * 60 * 60 * 24);
-
-      if (period === 'month') return diffInDays <= 30;
-      if (period === 'halfYear') return diffInDays <= 180;
-      if (period === 'year') return diffInDays <= 365;
-
-      return false;
-    });
-  }, [period, comments]);
-
-  const averageScore =
-    filteredComments.length === 0
-      ? 0
-      : Math.round(
-          filteredComments.reduce((sum, c) => sum + (c.score || 0), 0) /
-            filteredComments.length
-        );
-
-  const mostNegativeComment = [...filteredComments].sort(
-    (a, b) => (a.score || 0) - (b.score || 0)
-  )[0];
-
-  const mostPositiveComment = [...filteredComments].sort(
-    (a, b) => (b.score || 0) - (a.score || 0)
-  )[0];
-
-  const positiveCount = filteredComments.filter(
-    (c) => c.sentiment === 'positive'
-  ).length;
-
-  const negativeCount = filteredComments.filter(
-    (c) => c.sentiment === 'negative'
-  ).length;
-
-  const monthlyData = calculateMonthlyAverages(filteredComments);
-  const halfYearData = calculateHalfYearAverages(filteredComments);
-  const yearData = calculateYearAverages(filteredComments);
-
-  const sendReportByEmail = () => {
-    alert('📧 הדוח נשלח למייל בהצלחה (דמו)');
-  };
+  const chartData = reportData.data.map(d => d.avgScore);
 
   return (
     <div className="export-report-container">
-      {/* Header */}
       <div className="export-report-header">
         <h1>Report</h1>
-        <button className="send-report-btn" onClick={sendReportByEmail}>
-          📤 שלח דוח במייל
-        </button>
+        <button className="send-report-btn">📤 שלח דוח במייל</button>
       </div>
 
-      {/* Tabs */}
       <div className="report-period-tabs">
-        <button
-          className={period === 'month' ? 'report-tab active' : 'report-tab'}
-          onClick={() => setPeriod('month')}
-        >
-          חודש אחרון
-        </button>
-
-        <button
-          className={period === 'halfYear' ? 'report-tab active' : 'report-tab'}
-          onClick={() => setPeriod('halfYear')}
-        >
-          חצי שנה אחרונה
-        </button>
-
-        <button
-          className={period === 'year' ? 'report-tab active' : 'report-tab'}
-          onClick={() => setPeriod('year')}
-        >
-          שנה אחרונה
-        </button>
+        {['month', '6months', 'year'].map((p) => (
+          <button
+            key={p}
+            className={period === p ? 'report-tab active' : 'report-tab'}
+            onClick={() => setPeriod(p)}
+          >
+            {p === 'month' ? 'חודש אחרון' : p === '6months' ? 'חצי שנה' : 'שנה אחרונה'}
+          </button>
+        ))}
       </div>
 
-      {/* TOP GRID */}
       <div className="export-report-top-grid">
         <div className="report-card">
-          <BehaviorChangeCard
-            positiveChange={positiveCount}
-            negativeChange={negativeCount}
+          <BehaviorChangeCard 
+            positiveChange={reportData.changes.positive} 
+            negativeChange={reportData.changes.negative} 
           />
         </div>
-
         <div className="report-card">
-          <h3>מגמת ציון לאורך התקופה</h3>
-          {period === 'month' && <MonthlyTrendChart data={monthlyData} />}
-          {period === 'halfYear' && <HalfYearTrendChart data={halfYearData} />}
-          {period === 'year' && <YearTrendChart data={yearData} />}
+          <h3>מגמת ציון</h3>
+          {period === 'month' && <MonthlyTrendChart data={chartData} />}
+          {period === '6months' && <HalfYearTrendChart data={chartData} />}
+          {period === 'year' && <YearTrendChart data={chartData} />}
         </div>
-
         <div className="report-card">
-          <h3>ציון בריאות ממוצע לתקופה</h3>
-          <ScoreCircle score={averageScore} />
+          <h3>ציון בריאות ממוצע</h3>
+          <ScoreCircle score={reportData.data.length ? Math.round(reportData.data.reduce((a,b)=>a+b.avgScore,0)/reportData.data.length) : 0} />
         </div>
       </div>
 
-      {/* BOTTOM GRID */}
       <div className="export-report-bottom-grid">
-        {mostNegativeComment && (
+        {reportData.worstComment && (
           <div className="report-card wide">
-            <h3>⬇️ התגובה שהורידה הכי הרבה ציון</h3>
-            <CommentCard comment={mostNegativeComment} />
+            <h3>⬇️ התגובה שהורידה הכי הרבה</h3>
+            <CommentCard comment={reportData.worstComment} />
           </div>
         )}
-
-        {mostPositiveComment && (
+        {reportData.bestComment && (
           <div className="report-card wide">
-            <h3>⬆️ התגובה שהעלתה הכי הרבה ציון</h3>
-            <CommentCard comment={mostPositiveComment} />
+            <h3>⬆️ התגובה שהעלתה הכי הרבה</h3>
+            <CommentCard comment={reportData.bestComment} />
           </div>
         )}
       </div>
     </div>
   );
 }
-
-ExportReport.propTypes = {
-  comments: PropTypes.array.isRequired
-};
 
 export default ExportReport;

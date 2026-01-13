@@ -3,88 +3,82 @@ import Comment from '../models/Comment.js';
 import { analyzeComment } from '../utils/analyze.js'; 
 import { calculateHealthScore, getStatus } from '../utils/score.js';
 
-// 1. הוספת תגובה (POST)
-// server/controllers/commentsController.js
+/**
+ * הוספת תגובה חדשה, ניתוח שלה ושמירה למסד הנתונים
+ */
 export const addComment = async (req, res) => {
   try {
-    const { username, text, createdAt } = req.body; // הוסיפי את createdAt כאן
+    const { username, text, createdAt } = req.body;
     
+    // ניתוח התגובה (סנטימנט וניקוד)
     const analysisResult = await analyzeComment(text); 
 
     const newComment = new Comment({
       username: username || 'אנונימי',
       text: text,
       sentiment: analysisResult.sentiment,
-      score: Math.round(analysisResult.score),
-      createdAt: createdAt || new Date() // אם שלחת תאריך ב-Postman, הוא ישתמש בו
+      score: Math.round(analysisResult.score), // שמירת הניקוד המדויק
+      createdAt: createdAt || new Date()
     });
 
     await newComment.save();
 
-    
-    // החזרה לפוסטמן (כולל שדות דיבוג שלא נשמרו ב-DB)
-    res.status(201).json({
-      ...newComment.toObject(),
-      source_CHECK: analysisResult.debugSource, // כדי שתדעי אם זה AI
-      debug_final_score: analysisResult.score   // כדי לוודא את הניקוד
-    });
-
+    res.status(201).json(newComment);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// 2. קבלת סטטיסטיקה (GET)
-// 2. קבלת סטטיסטיקה (GET)
+/**
+ * קבלת סטטיסטיקה מעודכנת עבור ה-Live Feed
+ */
 export const getStats = async (req, res) => {
   try {
-    const allComments = await Comment.find().sort({ createdAt: 1 });
+    // משיכת כל התגובות מהמסד לצורך חישוב הציון הכללי
+    const allComments = await Comment.find();
     
-    // 1. חישוב הציון הנוכחי הכללי (מכל ההיסטוריה)
-    const totalImpactSum = allComments.reduce((sum, c) => sum + c.score, 0);
-    const currentHealthScore = Math.round(calculateHealthScore(totalImpactSum));
+    // חישוב סך כל הניקוד (השפעה מצטברת) - התיקון לבעיית הציון התקוע
+    const totalImpactSum = allComments.reduce((sum, c) => sum + (Number(c.score) || 0), 0);
+    
+    // חישוב ציון הבריאות הסופי (מבוסס על ה-BASE_SCORE ב-utils/score.js)
+    const currentHealthScore = calculateHealthScore(totalImpactSum);
 
-    // 2. לוגיקת "חלונות זמן" - 10 הימים האחרונים (עבור הגרף)
+    // הכנת נתונים לגרף הטרנד (10 ימים אחרונים)
     const healthHistory = [];
     const now = new Date();
-
     for (let i = 9; i >= 0; i--) {
       const targetDate = new Date();
       targetDate.setDate(now.getDate() - i);
-      const endOfTargetDay = i === 0 ? now : new Date(targetDate.setHours(23, 59, 59, 999));
+      const endOfDay = new Date(targetDate.setHours(23, 59, 59, 999));
       
       const impactAtPoint = allComments
-        .filter(c => new Date(c.createdAt) <= endOfTargetDay)
-        .reduce((sum, c) => sum + c.score, 0);
+        .filter(c => new Date(c.createdAt) <= endOfDay)
+        .reduce((sum, c) => sum + (Number(c.score) || 0), 0);
       
-      healthHistory.push(Math.round(calculateHealthScore(impactAtPoint)));
+      healthHistory.push(calculateHealthScore(impactAtPoint));
     }
 
-    // 3. סינון הודעות להיום בלבד (עבור האחוזים והפיד)
+    // סינון תגובות מהיום בלבד עבור הפיד המרכזי
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
-
     const todayComments = allComments.filter(c => new Date(c.createdAt) >= startOfDay);
 
-    // חישוב פילוח (Breakdown) ואחוזים - מהיום בלבד
     const positiveToday = todayComments.filter(c => c.sentiment === 'positive').length;
     const negativeToday = todayComments.filter(c => c.sentiment === 'negative').length;
-    const neutralToday = todayComments.length - positiveToday - negativeToday;
-    const totalToday = todayComments.length;
 
     res.json({
-      today: totalToday,
-      liveComments: [...todayComments].reverse(), 
       healthScore: currentHealthScore,
+      today: todayComments.length,
+      liveComments: [...todayComments].reverse(), 
       trendData: healthHistory,
       breakdown: { 
         positive: positiveToday, 
         negative: negativeToday, 
-        neutral: neutralToday 
+        neutral: todayComments.length - positiveToday - negativeToday 
       },
       percentages: {
-        positive: totalToday > 0 ? Math.round((positiveToday / totalToday) * 100) : 0,
-        negative: totalToday > 0 ? Math.round((negativeToday / totalToday) * 100) : 0
+        positive: todayComments.length > 0 ? Math.round((positiveToday / todayComments.length) * 100) : 0,
+        negative: todayComments.length > 0 ? Math.round((negativeToday / todayComments.length) * 100) : 0
       },
       status: getStatus(currentHealthScore)
     });
@@ -93,28 +87,31 @@ export const getStats = async (req, res) => {
   }
 };
 
+/**
+ * קבלת היסטוריית תגובות (50 אחרונות)
+ */
 export const getHistory = async (req, res) => {
   try {
-    // שינוי מ-timestamp ל-createdAt
     const comments = await Comment.find().sort({ createdAt: -1 }).limit(50); 
     res.json(comments);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-// הוספי בסוף הקובץ server/controllers/commentsController.js
 
-// הוסיפי את הפונקציה הזו בסוף הקובץ commentsController.js
+/**
+ * יצירת דוח תקופתי (חודש, חצי שנה, שנה)
+ */
+// server/controllers/commentsController.js
 
 export const getPeriodReport = async (req, res) => {
   try {
     const { period } = req.query; 
-    
     let startDate = new Date();
     let groupDefinition = {};
     let sortDefinition = {};
 
-    // הגדרת טווחי זמן (אותו דבר כמו קודם)
+    // הגדרת טווחי זמנים וקבצות
     switch (period) {
       case 'month':
         startDate.setMonth(startDate.getMonth() - 1);
@@ -126,78 +123,57 @@ export const getPeriodReport = async (req, res) => {
         groupDefinition = { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } };
         sortDefinition = { "_id.year": 1, "_id.month": 1 };
         break;
-      case '6months':
-      default:
+      default: // 6months
         startDate.setMonth(startDate.getMonth() - 6);
         groupDefinition = { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } };
         sortDefinition = { "_id.year": 1, "_id.month": 1 };
         break;
     }
 
+    // שליפת הנתונים מהמסד
     const reportDataRaw = await Comment.aggregate([
-      {
-        $match: { createdAt: { $gte: startDate } }
-      },
+      { $match: { createdAt: { $gte: startDate } } },
       {
         $group: {
           _id: groupDefinition,
-          avgScore: { $avg: "$score" },
+          totalPeriodScore: { $sum: "$score" }, 
           count: { $sum: 1 },
-          // --- כאן השינוי הגדול: ספירה מותנית ---
-          positiveCount: { 
-            $sum: { $cond: [{ $eq: ["$sentiment", "positive"] }, 1, 0] } 
-          },
-          negativeCount: { 
-            $sum: { $cond: [{ $eq: ["$sentiment", "negative"] }, 1, 0] } 
-          }
+          positiveCount: { $sum: { $cond: [{ $eq: ["$sentiment", "positive"] }, 1, 0] } },
+          negativeCount: { $sum: { $cond: [{ $eq: ["$sentiment", "negative"] }, 1, 0] } }
         }
       },
       { $sort: sortDefinition }
     ]);
 
-    // עיגול המספרים
+    // המרה לציון בריאות
     const reportData = reportDataRaw.map(item => ({
       ...item,
-      avgScore: Math.round(item.avgScore)
+      avgScore: calculateHealthScore(item.totalPeriodScore) 
     }));
 
     // שליפת תגובות קיצון
     const bestComment = await Comment.findOne({ createdAt: { $gte: startDate } }).sort({ score: -1 });
     const worstComment = await Comment.findOne({ createdAt: { $gte: startDate } }).sort({ score: 1 });
 
-    // --- חישוב אחוזי שינוי מפוצלים (חיובי בנפרד, שלילי בנפרד) ---
-    let changes = {
-      positive: 0, // אחוז שינוי בתגובות חיוביות
-      negative: 0  // אחוז שינוי בתגובות שליליות
-    };
-
+    // חישוב אחוזי שינוי (מותאם לעיצוב הפרונט)
+    let changes = { positive: 0, negative: 0 };
+    
     if (reportData.length >= 2) {
-      const current = reportData[reportData.length - 1];
-      const previous = reportData[reportData.length - 2];
+        const current = reportData[reportData.length - 1];
+        const previous = reportData[reportData.length - 2];
 
-      // חישוב אחוז שינוי לחיוביות
-      if (previous.positiveCount > 0) {
-        changes.positive = Math.round(((current.positiveCount - previous.positiveCount) / previous.positiveCount) * 100);
-      } else {
-        changes.positive = current.positiveCount > 0 ? 100 : 0;
-      }
+        // חיובי: עלייה = ירוק (חיובי), ירידה = אדום (שלילי)
+        changes.positive = previous.positiveCount > 0 
+            ? Math.round(((current.positiveCount - previous.positiveCount) / previous.positiveCount) * 100) 
+            : (current.positiveCount > 0 ? 100 : 0);
 
-      // חישוב אחוז שינוי לשליליות
-      if (previous.negativeCount > 0) {
-        changes.negative = Math.round(((current.negativeCount - previous.negativeCount) / previous.negativeCount) * 100);
-      } else {
-        changes.negative = current.negativeCount > 0 ? 100 : 0;
-      }
+        // שלילי: ירידה בתלונות = ירוק (חיובי), עלייה בתלונות = אדום (שלילי)
+        changes.negative = previous.negativeCount > 0 
+            ? Math.round(((previous.negativeCount - current.negativeCount) / previous.negativeCount) * 100) 
+            : (current.negativeCount > 0 ? -100 : 0); 
     }
 
-    res.json({
-      period, 
-      data: reportData, 
-      bestComment,
-      worstComment,
-      changes // האובייקט החדש עם האחוזים
-    });
-
+    res.json({ period, data: reportData, bestComment, worstComment, changes });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

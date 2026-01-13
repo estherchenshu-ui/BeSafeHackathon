@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import CommentCard from './CommentCard/CommentCard';
 
 const History = ({ comments }) => {
-  // ניהול מצב הפילטר הנבחר - ברירת מחדל 'all' כדי לראות הכל במצגת
+  // ניהול מצב הפילטר הנבחר - ברירת מחדל 'all'
   const [filter, setFilter] = useState('all');
 
   const now = new Date();
@@ -30,10 +30,9 @@ const History = ({ comments }) => {
     <div className="live-feed-container">
       <div className="live-feed-title">History</div>
 
-      {/* כפתורי סינון עם מחלקות CSS דינמיות */}
+      {/* כפתורי סינון - כאן תוקנו הכפילויות ב-className */}
       <div className="history-filters">
         <button
-          className={`history-filter-btn ${filter === 'all' ? 'active' : ''}`}
           className={`history-filter-btn ${filter === 'all' ? 'active' : ''}`}
           onClick={() => setFilter('all')}
         >
@@ -42,7 +41,6 @@ const History = ({ comments }) => {
 
         <button
           className={`history-filter-btn ${filter === '1h' ? 'active' : ''}`}
-          className={`history-filter-btn ${filter === '1h' ? 'active' : ''}`}
           onClick={() => setFilter('1h')}
         >
           שעה אחרונה
@@ -50,14 +48,12 @@ const History = ({ comments }) => {
 
         <button
           className={`history-filter-btn ${filter === '6h' ? 'active' : ''}`}
-          className={`history-filter-btn ${filter === '6h' ? 'active' : ''}`}
           onClick={() => setFilter('6h')}
         >
           6 שעות
         </button>
 
         <button
-          className={`history-filter-btn ${filter === '24h' ? 'active' : ''}`}
           className={`history-filter-btn ${filter === '24h' ? 'active' : ''}`}
           onClick={() => setFilter('24h')}
         >
@@ -72,13 +68,12 @@ const History = ({ comments }) => {
         ) : (
           filteredComments.map((comment, index) => (
             <CommentCard
-              key={index}
+              key={comment._id || index}
               comment={{
                 username: comment.username || comment.from || 'אנונימי',
                 text: comment.text,
                 sentiment: comment.sentiment || 'neutral',
                 createdAt: comment.createdAt,
-                // שימוש ב-score מהשרת, ואם לא קיים שימוש ב-impact
                 score: comment.score !== undefined ? comment.score : (comment.impact || 0),
                 impact: comment.impact
               }}
