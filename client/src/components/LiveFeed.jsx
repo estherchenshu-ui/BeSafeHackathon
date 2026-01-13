@@ -9,9 +9,9 @@ import ScoreCircle from './ScoreCircle';
 function LiveFeed({ stats, refreshData }) {
   const [showModal, setShowModal] = useState(false);
 
+  // חילוץ נתונים מתוך ה-stats שמגיע מהפרופס
   const safeComments = stats?.liveComments || [];
-
-  const score = stats?.healthScore ?? 100;
+  const currentScore = stats?.healthScore ?? 100;
 
   const positiveCount = stats?.breakdown?.positive || 0;
   const negativeCount = stats?.breakdown?.negative || 0;
@@ -28,32 +28,24 @@ function LiveFeed({ stats, refreshData }) {
 
   return (
     <div className="live-feed-container">
-
-      {/* כותרת מתחת ללוגו */}
       <div className="page-title-row">
         <h1 className="live-feed-title">Live Feed</h1>
       </div>
 
       <div className="live-feed-layout-fixed">
-
-        {/* מרכז – תגובות */}
         <div className="feed-center">
-
-          {/* כפתור הוספת תגובה – מיושר לימין */}
           <div className="add-comment-top">
             <button className="add-btn" onClick={() => setShowModal(true)}>
               ➕ הוספת תגובה
             </button>
           </div>
 
-          {/* שורת סיכום */}
           <div className="comments-summary-row">
             <div className="summary-item positive">✔ חיוביות {positiveCount}</div>
             <div className="summary-item negative">✖ שליליות {negativeCount}</div>
             <div className="summary-item neutral">● ניטרליות {neutralCount}</div>
           </div>
 
-          {/* אזור תגובות */}
           <div className="comments-section">
             {safeComments.length === 0 ? (
               <p className="no-comments-text">אין תגובות חדשות להיום.</p>
@@ -68,10 +60,9 @@ function LiveFeed({ stats, refreshData }) {
           </div>
         </div>
 
-        {/* ימין – פאנל */}
         <div className="right-panel">
-
-          <ScoreCircle score={score} />
+          {/* הציון שמתעדכן מהשרת */}
+          <ScoreCircle score={currentScore} />
 
           <UserSummaryCard
             username="Community View"
@@ -82,12 +73,9 @@ function LiveFeed({ stats, refreshData }) {
           />
 
           <TrendChart data={stats?.trendData || []} />
-
         </div>
-
       </div>
 
-      {/* מודאל */}
       {showModal && (
         <div className="modal-overlay">
           <div className="modal">
